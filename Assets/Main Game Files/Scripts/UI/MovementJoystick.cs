@@ -21,7 +21,7 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     [Space(2)]
 
     [Header("Components")]
-    [SerializeField] private Movement movement;
+    [SerializeField] private MovementController movementController;
 
 
     private RectTransform baseRect = null;
@@ -122,14 +122,14 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
         HandleInput(Input.magnitude, Input.normalized, radius, cam);
         handle.anchoredPosition = Input * radius * handleRange;
 
-        movement.InitiatePlayerMovement();
+        movementController.InitiatePlayerMovement();
     }
 
     public virtual void OnPointerUp(PointerEventData eventData) {
         Input = zero;
         handle.anchoredPosition = zero;
 
-        movement.InitiatePlayerMovement();
+        movementController.InitiatePlayerMovement();
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam) {
