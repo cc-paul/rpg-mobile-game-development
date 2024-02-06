@@ -5,35 +5,47 @@ using UnityEngine;
 
 public class BasicAnimation : MonoBehaviour {
     private AnimationPlayer animationPlayer;
-    private StatsManager statsManager;
+    private PlayerStatsManager playerStatsManager;
 
     private void Awake() {
         animationPlayer = GetComponent<AnimationPlayer>();
-        statsManager = GetComponent<StatsManager>();
+        playerStatsManager = GetComponent<PlayerStatsManager>();
     }
 
     private void Start() {
-        PlayBasicAnimation(Global.AnimationCategory.Idle);
+        PlayBasicAnimation(_animationCategory: Global.AnimationCategory.Idle);
     }
 
-    public void PlayBasicAnimation(Global.AnimationCategory animationCategory) {
+    public void PlayBasicAnimation(Global.AnimationCategory _animationCategory) {
         string animationToPlay = null;
 
-        if (animationCategory == Global.AnimationCategory.Idle) {
-            if (statsManager.GetSetCharacterType == Global.Characters.Swordsman) {
-                if (statsManager.GetSetGender == Global.Gender.Male) {
+        if (_animationCategory == Global.AnimationCategory.Idle) {
+            if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
+                if (playerStatsManager.GetSetGender == Global.Gender.Male) {
                     animationToPlay = Global.SwordsmanNormalAnimation.Sword_Base_Idle.ToString();
                 }
             }
         }
 
-        if (animationCategory == Global.AnimationCategory.Walk) {
-            if (statsManager.GetSetCharacterType == Global.Characters.Swordsman) {
-                if (statsManager.GetSetGender == Global.Gender.Male) {
-                    if (statsManager.GetSetHasWeapon) {
+        if (_animationCategory == Global.AnimationCategory.Walk) {
+            if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
+                if (playerStatsManager.GetSetGender == Global.Gender.Male) {
+                    if (playerStatsManager.GetSetHasWeapon) {
                         animationToPlay = Global.SwordsmanNormalAnimation.Walk_Sword.ToString();
                     } else {
                         animationToPlay = Global.SwordsmanNormalAnimation.Walk_No_Sword.ToString();
+                    }
+                }
+            }
+        }
+
+        if (_animationCategory == Global.AnimationCategory.Run) {
+            if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
+                if (playerStatsManager.GetSetGender == Global.Gender.Male) {
+                    if (playerStatsManager.GetSetHasWeapon) {
+                        animationToPlay = Global.SwordsmanNormalAnimation.Run_Sword.ToString();
+                    } else {
+                        animationToPlay = Global.SwordsmanNormalAnimation.Run_No_Sword.ToString();
                     }
                 }
             }

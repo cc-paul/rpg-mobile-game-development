@@ -12,18 +12,18 @@ public class AnimationPlayer : MonoBehaviour {
     [Header("Components")]
     [SerializeField] private AnimancerComponent animancerComponent;
 
-    private StatsManager statsManager;
+    private PlayerStatsManager playerStatsManager;
     private AnimationClip animationClip;
     private AnimationClipInfo animationClipInfo;
 
     private void Awake() {
-        statsManager = GetComponent<StatsManager>();
+        playerStatsManager = GetComponent<PlayerStatsManager>();
     }
 
     public void PlayAnimationByName(string _currentAnimationName,bool _isNormalAnimation) {
         animationClip = null;
 
-        if (statsManager.GetSetCharacterType == Global.Characters.Swordsman) {
+        if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
             if (_isNormalAnimation) {
                 animationClipInfo = swordsmanNormalAttackAnimation.Find(
                     clipInfo => clipInfo.swordsmanNormalAnimationName.ToString() == _currentAnimationName
