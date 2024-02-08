@@ -1,0 +1,52 @@
+{
+  "Items": [
+    {
+      "buttonID": 1,
+      "skillID": 7
+    },
+    {
+      "buttonID": 2,
+      "skillID": 3
+    },
+    {
+      "buttonID": 3,
+      "skillID": 2
+    },
+    {
+      "buttonID": 4,
+      "skillID": 4
+    },
+    {
+      "buttonID": 5,
+      "skillID": 5
+    },
+    {
+      "buttonID": 6,
+      "skillID": 1
+    },
+    {
+      "buttonID": 7,
+      "skillID": 6
+    },
+    {
+      "buttonID": 8,
+      "skillID": -1
+    },
+    {
+      "buttonID": 9,
+      "skillID": -1
+    },
+    {
+      "buttonID": 10,
+      "skillID": -1
+    },
+    {
+      "buttonID": 11,
+      "skillID": -1
+    },
+    {
+      "buttonID": 12,
+      "skillID": -1
+    }
+  ]
+}

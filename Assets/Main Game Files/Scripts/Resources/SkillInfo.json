@@ -1,0 +1,166 @@
+{
+    "statusCode": 201,
+    "success": true,
+    "messages": [
+        "Skills has been retreived"
+    ],
+    "data": {
+        "rows_returned": 6,
+        "records": [
+        	{
+				"character" : "Swordsman",
+				"skillDetails" : [
+					{
+						"type" : "Power",
+						"details" : [
+							{
+								"id" : 0,
+								"displayName" : "Normal Attack",
+								"defaultCooldown" : 0,
+								"baseDamage" : 0,
+								"indicatorType" : "Area",
+								"maxTarget" : 1,
+								"areaRange" : 0.3,
+								"includeInSkillList" : false,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 4,
+								"icon" : "",
+								"requiresWeapon" : false					
+							},
+							{
+								"id" : 1,
+								"displayName" : "Ice Crack",
+								"defaultCooldown" : 2,
+								"baseDamage" : 100,
+								"indicatorType" : "Line",
+								"maxTarget" : 1,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_ice_crack",
+								"requiresWeapon" : true	
+							},
+							{
+								"id" : 2,
+								"displayName" : "Ground Impact",
+								"defaultCooldown" : 3,
+								"baseDamage" : 750,
+								"indicatorType" : "Area",
+								"maxTarget" : 5,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_ground_impact",
+								"requiresWeapon" : true	
+							},
+							{
+								"id" : 3,
+								"displayName" : "Lightning Ball",
+								"defaultCooldown" : 2,
+								"baseDamage" : 200,
+								"indicatorType" : "Area",
+								"maxTarget" : 5,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_lightning_ball",
+								"requiresWeapon" : true	
+							},
+							{
+								"id" : 4,
+								"displayName" : "Lightning Strike",
+								"defaultCooldown" : 10,
+								"baseDamage" : 1000,
+								"indicatorType" : "Area",
+								"maxTarget" : 5,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_lightning_strike",
+								"requiresWeapon" : true	
+							},
+							{
+								"id" : 5,
+								"displayName" : "Health Up",
+								"defaultCooldown" : 1,
+								"baseDamage" : 0,
+								"indicatorType" : "Area",
+								"maxTarget" : 8,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 1000,
+								"forAlly" : true,
+								"deactivationTime" : 20,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_health_up",
+								"requiresWeapon" : true	
+							},
+							{
+								"id" : 6,
+								"displayName" : "Speed Up",
+								"defaultCooldown" : 1,
+								"baseDamage" : 0,
+								"indicatorType" : "Area",
+								"maxTarget" : 8,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : true,
+								"deactivationTime" : 15,
+								"mpConsumption" : 10,
+								"addedSpeed" : 2,
+								"distanceToCast" : 0,
+								"icon" : "icon_speed_up",
+								"requiresWeapon" : true	
+							},
+							{
+								"id" : 7,
+								"displayName" : "Ice Down Wave",
+								"defaultCooldown" : 5,
+								"baseDamage" : 300,
+								"indicatorType" : "Area",
+								"maxTarget" : 8,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 10,
+								"addedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_ice_down_wave",
+								"requiresWeapon" : true	
+							}
+						]
+					}
+				]
+			}
+        ]
+    }
+}
