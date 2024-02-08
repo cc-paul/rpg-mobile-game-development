@@ -42,46 +42,73 @@ public class PlayerStatsManager : MonoBehaviour {
     public CharacterStat MPRegenValue;
     public CharacterStat BaseDamage;
 
-    private ModelInfoDisplay modelInfoDisplay;
+    private PlayerStatsController playerStatsController;
+    private Coroutine regenMPCourotine;
+    private Coroutine regenHPCourotine;
 
-    #region GetSet Properties
+    #region Character GetSet Properties
+    public Global.Characters GetSetCharacterType {
+        get { return characterType; }
+        set { characterType = value; }
+    }
+
+    public int GetSetPlayerID {
+        get { return playerID; }
+        set { playerID = value; }
+    }
+
     public Global.Gender GetSetGender {
         get { return characterGender; }
         set { characterGender = value; }
     }
 
-    public Global.Characters GetSetCharacterType {
-        get { return characterType; }
-        set { characterType = value; }
+    public string GetSetCharacterName {
+        get { return characterName; }
+        set { characterName = value; }
+    }
+
+    public string GetSetClanName {
+        get { return clanName; }
+        set { clanName = value; }
+    }
+
+    public bool GetSetHasClan {
+        get { return hasClan; }
+        set { hasClan = value; }
+    }
+
+    public bool GetSetIsLongSword {
+        get { return isLongSword; }
+        set { isLongSword = value; }
     }
 
     public bool GetSetHasWeapon {
         get { return hasWeapon; }
         set { hasWeapon = value; }
     }
+
+    public int GetSetMaxTargetToLure {
+        get { return maxTargetToLure; }
+        set { maxTargetToLure = value; }
+    }
+
+    public Coroutine GetSetHPCoroutine {
+        get { return regenHPCourotine; }
+        set { regenHPCourotine = value; }
+    }
+
+    public Coroutine GetSetMPCoroutine {
+        get { return regenMPCourotine; }
+        set { regenMPCourotine = value; }
+    }
     #endregion
 
     private void Awake() {
-        modelInfoDisplay = GetComponent<ModelInfoDisplay>();
+        playerStatsController = GetComponent<PlayerStatsController>();
 
         if (useInspectorStats) {
             AddDefaultStats();
         }
-    }
-
-    private void Start() {
-        modelInfoDisplay.DisplayCharacterDetails(
-            _characterName: characterName,
-            _clanName: clanName,
-            _hasClan: hasClan
-        );
-
-        modelInfoDisplay.DisplayLifeStats(
-            _currentHP: Health.Value,
-            _maxHP: MaxHealth.Value,
-            _currentMP: MP.Value,
-            _maxMP: MaxMP.Value
-        );
     }
 
     private void AddDefaultStats() {
@@ -97,5 +124,29 @@ public class PlayerStatsManager : MonoBehaviour {
         HealthRegenValue.BaseValue = baseRegenHP;
         MPRegenValue.BaseValue = baseRegenMP;
         BaseDamage.BaseValue = baseDamage;
+    }
+
+    public IEnumerator RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
+        while (stat.Value < maxStat.Value && (int)stat.Value != 0) {
+            StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
+            stat.AddModifier(regenModifier);
+
+            playerStatsController.UpdateHealthUI();
+
+            if (stat.Value >= maxStat.Value) {
+                RecalibrateStat(stat,maxStat);
+                break;
+            }
+
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    public void RecalibrateStat(CharacterStat stat, CharacterStat maxStat) {
+        if (stat.Value > maxStat.Value) {
+            float difference = stat.Value - maxStat.Value;
+            StatModifier deductModifier = new StatModifier(-difference, Global.StatModType.Flat, this);
+            stat.AddModifier(deductModifier);
+        }
     }
 }

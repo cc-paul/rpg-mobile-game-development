@@ -33,6 +33,14 @@ public class Global {
         Default
     }
 
+    /* Command */
+    public enum Command {
+        Attack,
+        Stop_Attack,
+        Heal,
+        Stop_Heal
+    }
+
     /* Swordsman Normal Animation */
     public enum SwordsmanNormalAnimation {
         Sword_Base_Idle,
@@ -45,9 +53,25 @@ public class Global {
         Death_Sword
     }
 
+    public enum GameTags {
+        Player
+    }
+
+    /* Animation Category */
     public enum AnimationCategory {
         Idle,
         Walk,
         Run
     }
+
+    /* Game Object */
+    public const string GENERAL_SETTINGS = "General Settings";
+    public const string BUTTON_SKILL_NAME = "Button Skill Slot #";
+    public const string BACKGROUND = "Background";
+    public const string HANDLE = "Handle";
+    public const string TIMER_IMAGE = "Timer Image";
+    public const string COUNTER = "Counter";
+
+    /* File Names */
+    public const string QUICK_SLOT_FILE = "QuickSlot_";
 }
