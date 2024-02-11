@@ -17,16 +17,41 @@ public class SkillSetup : MonoBehaviour {
 
     private PlayerStatsManager playerStatsManager;
     private SkillCommand skillCommand;
+    private SkillReference skillReference;
     private string skillConfigFileName;
 
     private List<SkillConfigurationInfo> skillConfigurationInfo = new List<SkillConfigurationInfo>();
 
     private void Awake() {
         playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
+        skillReference = GetComponent<SkillReference>();
         skillConfigFileName = $"{Global.QUICK_SLOT_FILE}{playerStatsManager.GetSetCharacterType}_{playerStatsManager.GetSetCharacterType}_{playerStatsManager.GetSetPlayerID}";
+    }
 
+    private void Start() {
+        SetSkillBaseReference();
         SetupTestSkillConfiguration();
-        //SetupSkillConfiguration();
+    }
+
+    private void SetSkillBaseReference() {
+        //TODO : This section gets the skill list from an API that will be basis of the skill settings used by the player
+        skillReference.GetSetPlayerSkillList = FileHandler.ReadFromJSONString<BaseResponse<BaseResponseData<SkillPattern>>>(testSkillAPIJSON.text);
+
+        if (skillReference.GetSetPlayerSkillList.success) {
+            BaseResponseData<SkillPattern> skillPatternData = skillReference.GetSetPlayerSkillList.data;
+
+            if (skillPatternData.rows_returned != 0) {
+                foreach (SkillPattern current in skillPatternData.records) {
+                    if (current.character == playerStatsManager.GetSetCharacterType.ToString()) {
+                        skillReference.GetSetSkillTypeList = current.skillDetails;
+                    }
+                }
+            } else {
+                Debug.LogError("Empty Skill Set");
+            }
+        } else {
+            Debug.LogError("No Skill Pattern Retreived");
+        }
     }
 
     private void SetupTestSkillConfiguration() {
@@ -35,10 +60,19 @@ public class SkillSetup : MonoBehaviour {
 
         foreach (SkillConfigurationInfo _currentConfig in skillConfigurationInfo) {
             skillCommand = skillButtonParent.transform.
-                Find(Global.BUTTON_SKILL_NAME + _currentConfig.buttonID)
-                .GetComponent<SkillCommand>();
+                Find(Global.BUTTON_SKILL_NAME + _currentConfig.buttonID).
+                GetComponent<SkillCommand>();
 
             skillCommand.GetSetSkillID = _currentConfig.skillID;
+            skillCommand.GetSetPrefCooldownRef = $"{Global.PREFS_SKILLNO_}{_currentConfig.skillID}";
+            skillCommand.SetSkillSprite(
+                skillSprite: skillReference.GetSkillSprite(
+                   iconName: skillReference.GetIconName(
+                      skillID: _currentConfig.skillID
+                   )
+                )
+            );
+            skillCommand.RecalibrateCooldown();
         }
     }
 

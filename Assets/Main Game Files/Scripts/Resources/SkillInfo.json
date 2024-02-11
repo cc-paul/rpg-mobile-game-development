@@ -142,7 +142,7 @@
 							{
 								"id" : 7,
 								"displayName" : "Ice Down Wave",
-								"defaultCooldown" : 5,
+								"defaultCooldown" : 50,
 								"baseDamage" : 300,
 								"indicatorType" : "Area",
 								"maxTarget" : 8,

@@ -130,7 +130,7 @@ public class CameraControl : MonoBehaviour {
 
                 deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 
-                fov = currentFOV - +(deltaMagnitudeDiff * zoomSpeed / 100);
+                fov = currentFOV + -(deltaMagnitudeDiff * zoomSpeed / 100);
                 fov = Mathf.Clamp(fov, maxFOV, minFOV);
                 currentFOV = fov;
             } else {

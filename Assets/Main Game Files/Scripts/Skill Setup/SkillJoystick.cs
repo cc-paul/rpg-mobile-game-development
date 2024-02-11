@@ -18,7 +18,7 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     [SerializeField] private RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
 
-
+    private SkillCommand skillCommand;
     private RectTransform baseRect = null;
     private Canvas canvas;
     private Camera cam;
@@ -81,6 +81,10 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     }
     #endregion
 
+    private void Awake() {
+        skillCommand = GetComponent<SkillCommand>();
+    }
+
 
     protected virtual void Start() {
         HandleRange = handleRange;
@@ -121,6 +125,10 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     public virtual void OnPointerUp(PointerEventData eventData) {
         Input = zero;
         handle.anchoredPosition = zero;
+
+        if (!skillCommand.GetSetIsNormalAttack) {
+            skillCommand.OnSkillCasted();
+        }
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam) {
