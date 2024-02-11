@@ -13,7 +13,7 @@ public class SkillButtonSwapper : MonoBehaviour {
     private int skillButtonListCount;
     private int startNumber = 1;
     private int endNumber = 4;
-    private float parentSize = 115;
+    private float parentSize = 100;
     private float holderSize = 50;
     private float textSize = 36;
 
@@ -54,12 +54,12 @@ public class SkillButtonSwapper : MonoBehaviour {
         RectTransform buttonRect = currentButton.GetComponent<RectTransform>();
         GameObject background = currentButton.transform.Find(Global.BACKGROUND).gameObject;
         RectTransform backgroundRect = background.GetComponent<RectTransform>();
-        RectTransform handleRect = background.transform.Find(Global.HANDLE).GetComponent<RectTransform>();
+        RectTransform handleRect = currentButton.transform.Find(Global.HANDLE).GetComponent<RectTransform>();
         RectTransform timerImageRect = currentButton.transform.Find(Global.TIMER_IMAGE).GetComponent<RectTransform>();
         TextMeshProUGUI textCounter = currentButton.transform.Find(Global.COUNTER).GetComponent<TextMeshProUGUI>();
 
         Vector2 sizeDelta = showIt ? new Vector2(parentSize, parentSize) : Vector2.zero;
-        Vector2 timerSizeDelta = showIt ? new Vector2(parentSize + 2, parentSize + 2) : Vector2.zero;
+        Vector2 timerSizeDelta = showIt ? new Vector2(parentSize + 5, parentSize + 5) : Vector2.zero;
 
         buttonRect.sizeDelta = sizeDelta;
         backgroundRect.sizeDelta = sizeDelta;

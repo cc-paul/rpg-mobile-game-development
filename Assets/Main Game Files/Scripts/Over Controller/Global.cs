@@ -64,6 +64,17 @@ public class Global {
         Run
     }
 
+    /* Swordsman Skill Icon */
+    public enum SwordsmanSkillIcon {
+        icon_ice_crack,
+        icon_ground_impact,
+        icon_lightning_ball,
+        icon_lightning_strike,
+        icon_health_up,
+        icon_speed_up,
+        icon_ice_down_wave
+    }
+
     /* Game Object */
     public const string GENERAL_SETTINGS = "General Settings";
     public const string BUTTON_SKILL_NAME = "Button Skill Slot #";
@@ -72,6 +83,7 @@ public class Global {
     public const string TIMER_IMAGE = "Timer Image";
     public const string COUNTER = "Counter";
 
-    /* File Names */
+    /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";
+    public const string PREFS_SKILLNO_ = "Prefs_Skill_No_";
 }
