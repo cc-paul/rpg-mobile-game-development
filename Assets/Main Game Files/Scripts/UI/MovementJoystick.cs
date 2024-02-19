@@ -23,7 +23,7 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     [Header("Components")]
     [SerializeField] private MovementController movementController;
 
-
+    private MovementArrowIndicator movementArrowIndicator;
     private RectTransform baseRect = null;
     private Canvas canvas;
     private Camera cam;
@@ -86,6 +86,10 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     }
     #endregion
 
+    private void Awake() {
+        movementArrowIndicator = GetComponent<MovementArrowIndicator>();
+    }
+
 
     protected virtual void Start() {
         HandleRange = handleRange;
@@ -123,6 +127,8 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
         handle.anchoredPosition = Input * radius * handleRange;
 
         movementController.InitiatePlayerMovement();
+        movementArrowIndicator.HideShowArrow(showArrow: true);
+        movementArrowIndicator.RotateArrow(movementJoystick: this);
     }
 
     public virtual void OnPointerUp(PointerEventData eventData) {
@@ -130,6 +136,7 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
         handle.anchoredPosition = zero;
 
         movementController.InitiatePlayerMovement();
+        movementArrowIndicator.HideShowArrow(false);
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam) {

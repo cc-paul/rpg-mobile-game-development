@@ -15,6 +15,7 @@ public class SkillReference : MonoBehaviour {
     private PlayerStatsManager playerStatsManager;
     private BaseResponse<BaseResponseData<SkillPattern>> playerSkillList = new BaseResponse<BaseResponseData<SkillPattern>>();
     private List<SkillType> skillTypeList = new List<SkillType>();
+    private int finalSkillID;
     
 
     #region GetSet Properties
@@ -26,6 +27,11 @@ public class SkillReference : MonoBehaviour {
     public List<SkillType> GetSetSkillTypeList {
         get { return skillTypeList; }
         set { skillTypeList = value; }
+    }
+
+    public int GetSetFinalSkillID {
+        get { return finalSkillID; }
+        set { finalSkillID = value; }
     }
     #endregion
 
@@ -50,6 +56,7 @@ public class SkillReference : MonoBehaviour {
     }
 
     public string GetTargetIndicator(int skillID) {
+        finalSkillID = skillID;
         return GetSkillProperty(skillID, skillDetail => skillDetail.indicatorType);
     }
 
