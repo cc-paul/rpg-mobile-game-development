@@ -6,6 +6,11 @@ public class TagLookAtCamera : MonoBehaviour {
     [Header("Game Object and Others")]
     [SerializeField] private List<NameTagInfo> nameTagInfoList = new List<NameTagInfo> ();
 
+    [Space(2)]
+
+    [Header("Variable declarations and assignments")]
+    [SerializeField] private bool getChildElement = false;
+
     private Camera camera;
     private Vector3 vectorForward = Vector3.forward;
     private Vector3 vectorUp = Vector3.up;
@@ -15,8 +20,26 @@ public class TagLookAtCamera : MonoBehaviour {
     private float finalScale;
     private float distance;
 
+    private GameObject basicInfoUI;
+    private Transform nameHolder;
+
     private void Awake() {
         camera = Camera.main;
+    }
+
+    private void Start() {
+        if (!getChildElement) return;
+        if (gameObject.transform.childCount == 0) return;
+
+        foreach (Transform currentObject in gameObject.transform) {
+            basicInfoUI = currentObject.transform.Find(Global.BASIC_INFO_UI).gameObject;
+            nameHolder = basicInfoUI.transform.GetChild(0);
+
+            nameTagInfoList.Add(new NameTagInfo {
+                uiTag = nameHolder,
+                isHP = false
+            });
+        }
     }
 
     private void LateUpdate() {
@@ -26,7 +49,7 @@ public class TagLookAtCamera : MonoBehaviour {
                 camera.transform.rotation * vectorUp
             );
 
-            distance = Vector3.Distance(nameTagInfo.uiTag.position,camera.transform.position);
+            distance = Vector3.Distance(nameTagInfo.uiTag.position, camera.transform.position);
             scaleFactor = distance / 10f;
             scaleFactor = Mathf.Clamp(scaleFactor, 0.1f, 1.5f);
             scaleFactorHP = distance / 15f;

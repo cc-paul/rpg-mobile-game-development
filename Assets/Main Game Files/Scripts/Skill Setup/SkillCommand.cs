@@ -9,13 +9,19 @@ public class SkillCommand : MonoBehaviour {
     [SerializeField] private Image timerImageCooldown;
     [SerializeField] private Sprite defaultBackground;
 
-    [Header("Game Objects")]
+    [Header("Game Objects and otherts")]
     [SerializeField] private GameObject gameManager;
     [SerializeField] private GameObject skillSettings;
+    [SerializeField] private GameObject border;
+    [SerializeField] private GameObject lineTargetIndicator;
+    [SerializeField] private GameObject areaTargetIndicator;
 
     [Header("Variable Declarations and other assignment")]
     [SerializeField] private bool isNormalAttack;
 
+    private GameObject currentTargetIndicator;
+    private TargetManager targetManager;
+    private SkillSetup skillSetup;
     private SkillReference skillReference;
     private DateAndTime dateAndTime;
     private Coroutine cooldownCoroutine;
@@ -26,6 +32,7 @@ public class SkillCommand : MonoBehaviour {
     private string prefCooldownRef;
     private bool isSkillCasted = false;
     private bool showTimerImage;
+    private bool isCoolingDown;
 
     #region GetSet Properties
     public int GetSetSkillID {
@@ -42,10 +49,17 @@ public class SkillCommand : MonoBehaviour {
         get { return isNormalAttack; }
         set { isNormalAttack = value; }
     }
+
+    public bool GetSetIsCoolingDown {
+        get { return isCoolingDown; }
+        set { isCoolingDown = value; }
+    }
     #endregion
 
     private void Awake() {
+        targetManager = skillSettings.GetComponent<TargetManager>();
         skillReference = skillSettings.GetComponent<SkillReference>();
+        skillSetup = skillSettings.GetComponent<SkillSetup>();
         dateAndTime = gameManager.GetComponent<DateAndTime>();        
     }
 
@@ -59,15 +73,50 @@ public class SkillCommand : MonoBehaviour {
         skillBackground.sprite = skillSprite == null ? defaultBackground : skillSprite;
     }
 
-    public void OnCastingSkill() {
+    public void OnBeforeCast() {
+        currentTargetIndicator = skillReference.GetTargetIndicator(skillID: skillID) == Global.TargetIndicator.Line.ToString() ? lineTargetIndicator : areaTargetIndicator;
+        currentTargetIndicator.SetActive(true);
 
+        if (currentTargetIndicator == areaTargetIndicator) {
+            float scale = skillReference.GetSkillTargetRanger(skillID: skillID);
+            GameObject areaParentTarget = currentTargetIndicator.transform.GetChild(0).gameObject;
+            GameObject areaChildTarget = areaParentTarget.transform.GetChild(0).gameObject;
+            AreaTarget areaTarget = areaChildTarget.GetComponent<AreaTarget>();
+            RangeAdjust rangeAdjust = areaParentTarget.GetComponent<RangeAdjust>();
+
+            rangeAdjust.GetSetRange = scale;
+            rangeAdjust.DoTheRescaling();
+            areaTarget.ResizeTheCollider();
+        } else {
+            GameObject lineParentTarget = currentTargetIndicator.transform.GetChild(0).gameObject;
+            GameObject lineRangePivot = lineParentTarget.transform.GetChild(0).gameObject;
+            LineTarget lineTarget = lineRangePivot.GetComponent<LineTarget>();
+
+            lineTarget.ResizeTheCollider();
+        }
+    }
+
+    public void OnCastingSkill(SkillJoystick skillJoystick) {
+        if (currentTargetIndicator == areaTargetIndicator) {
+            GameObject areaParentTarget = currentTargetIndicator.transform.GetChild(0).gameObject;
+            GameObject childTarget = areaParentTarget.transform.GetChild(0).gameObject;
+            AreaTarget areaTarget = childTarget.GetComponent<AreaTarget>();
+
+            areaTarget.ControlTheChildTarget(skillJoystick: skillJoystick);
+        } else {
+            GameObject lineParentTarget = currentTargetIndicator.transform.GetChild(0).gameObject;
+            GameObject lineRangePivot = lineParentTarget.transform.GetChild(0).gameObject;
+            LineTarget lineTarget = lineRangePivot.GetComponent<LineTarget>();
+
+            lineTarget.ControlTheChildTarget(skillJoystick: skillJoystick);
+        }
     }
 
     public void OnSkillCasted() {
-
-
         //TODO: Use the function below only after the player casted a skill
         expectedCooldown = skillReference.GetSkillDefaultCoolDown(skillID: skillID);
+        currentTargetIndicator.SetActive(false);
+        targetManager.HideAllTargetIndicators();
         SetSkillLastUse();
         InitializeCooldown();
     }
@@ -106,6 +155,7 @@ public class SkillCommand : MonoBehaviour {
         }
 
         timer = 0f;
+        isCoolingDown = true;
         timerImageCooldown.gameObject.SetActive(true);
         cooldownCoroutine = StartCoroutine(nameof(StartCoolDown));
     }
@@ -117,6 +167,7 @@ public class SkillCommand : MonoBehaviour {
             yield return null;
         }
 
+        isCoolingDown = false;
         timerImageCooldown.gameObject.SetActive(false);
     }
 }

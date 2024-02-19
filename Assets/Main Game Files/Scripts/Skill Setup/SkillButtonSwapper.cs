@@ -45,7 +45,7 @@ public class SkillButtonSwapper : MonoBehaviour {
             currentSkillButton = skillButtonParent.transform.
                 Find(Global.BUTTON_SKILL_NAME + i).
                 gameObject;
- 
+
             HideShowButtonSkill(currentSkillButton, i >= startNumber && i <= endNumber);
         }
     }
@@ -54,13 +54,16 @@ public class SkillButtonSwapper : MonoBehaviour {
         RectTransform buttonRect = currentButton.GetComponent<RectTransform>();
         GameObject background = currentButton.transform.Find(Global.BACKGROUND).gameObject;
         RectTransform backgroundRect = background.GetComponent<RectTransform>();
+        RectTransform borderRect = currentButton.transform.Find(Global.BORDER).GetComponent<RectTransform>();
         RectTransform handleRect = currentButton.transform.Find(Global.HANDLE).GetComponent<RectTransform>();
         RectTransform timerImageRect = currentButton.transform.Find(Global.TIMER_IMAGE).GetComponent<RectTransform>();
         TextMeshProUGUI textCounter = currentButton.transform.Find(Global.COUNTER).GetComponent<TextMeshProUGUI>();
 
         Vector2 sizeDelta = showIt ? new Vector2(parentSize, parentSize) : Vector2.zero;
-        Vector2 timerSizeDelta = showIt ? new Vector2(parentSize + 5, parentSize + 5) : Vector2.zero;
+        Vector2 timerSizeDelta = showIt ? new Vector2(parentSize, parentSize) : Vector2.zero;
+        Vector2 borderSizeDelta = showIt ? new Vector2(parentSize + 10f, parentSize + 10f) : Vector2.zero;
 
+        borderRect.sizeDelta = borderSizeDelta;
         buttonRect.sizeDelta = sizeDelta;
         backgroundRect.sizeDelta = sizeDelta;
         handleRect.sizeDelta = showIt ? new Vector2(holderSize, holderSize) : Vector2.zero;

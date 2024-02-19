@@ -9,8 +9,8 @@ public class ModelInfoDisplay : MonoBehaviour {
     [SerializeField] private TextMeshProUGUI clanNameText;
     [SerializeField] private TextMeshProUGUI characterNameText;
     [SerializeField] private TextMeshProUGUI characterNameTextDuplicate;
-    [SerializeField] private TextMeshProUGUI hpTextMain;
-    [SerializeField] private TextMeshProUGUI mpTextMain;
+    [SerializeField] private Text hpTextMain;
+    [SerializeField] private Text mpTextMain;
     [SerializeField] private Image clanImage;
     [SerializeField] private Image schoolImage;
     [SerializeField] private Image schoolImageDuplicate;

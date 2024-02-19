@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
+    [Header("Game Objects and otherts")]
+    [SerializeField] private GameObject skillSettings;
+
+    [Space(2)]
+
     [Header("Variable Declaration and Adjustment")]
     [SerializeField] private float handleRange = 1;
     [SerializeField] private float deadZone = 0;
@@ -18,6 +23,12 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     [SerializeField] private RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
 
+    [Space(2)]
+
+    [Header("Components")]
+    [SerializeField] private SkillSetup skillSetup;
+
+    private TargetManager targetManager;
     private SkillCommand skillCommand;
     private RectTransform baseRect = null;
     private Canvas canvas;
@@ -82,6 +93,7 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     #endregion
 
     private void Awake() {
+        targetManager = skillSettings.GetComponent<TargetManager>();
         skillCommand = GetComponent<SkillCommand>();
     }
 
@@ -103,30 +115,57 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
         fixedPosition = background.anchoredPosition;
         background.anchoredPosition = fixedPosition;
         background.gameObject.SetActive(true);
+        handle.gameObject.SetActive(false);
     }
 
     public virtual void OnPointerDown(PointerEventData eventData) {
-        OnDrag(eventData);
+        if (skillCommand.GetSetSkillID == -1) return;
+        if (skillCommand.GetSetIsCoolingDown) return;
+        
+        skillSetup.SetPrimarySkillButton(gameObject.name.ToString());
+
+        if (gameObject.name.ToString() == skillSetup.GetSetButtonSkillName) {
+            //if (!movement.GetSetIsInSkillAnimation) {
+                targetManager.ClearTargetList(true);
+            //}
+            skillCommand.OnBeforeCast();
+            OnDrag(eventData);
+        }
     }
 
     public void OnDrag(PointerEventData eventData) {
-        cam = null;
-        if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
-            cam = canvas.worldCamera;
+        if (skillCommand.GetSetSkillID == -1) return;
+        if (skillCommand.GetSetIsCoolingDown) return;
 
-        position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
-        radius = background.sizeDelta / 2;
-        Input = (eventData.position - position) / (radius * canvas.scaleFactor);
-        FormatInput();
-        HandleInput(Input.magnitude, Input.normalized, radius, cam);
-        handle.anchoredPosition = Input * radius * handleRange;
+        if (gameObject.name.ToString() != skillSetup.GetSetButtonSkillName) {
+            skillSetup.SetPrimarySkillButton(skillSetup.GetSetButtonSkillName);
+        }
+
+        if (gameObject.name == skillSetup.GetSetButtonSkillName) {
+            cam = null;
+            if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+                cam = canvas.worldCamera;
+
+            position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
+            radius = background.sizeDelta / 2;
+            Input = (eventData.position - position) / (radius * canvas.scaleFactor);
+            FormatInput();
+            HandleInput(Input.magnitude, Input.normalized, radius, cam);
+            handle.anchoredPosition = Input * radius * handleRange;
+            handle.gameObject.SetActive(true);
+            skillCommand.OnCastingSkill(skillJoystick: this);
+        }
     }
 
     public virtual void OnPointerUp(PointerEventData eventData) {
-        Input = zero;
-        handle.anchoredPosition = zero;
+        if (skillCommand.GetSetSkillID == -1) return;
+        if (skillCommand.GetSetIsCoolingDown) return;
 
-        if (!skillCommand.GetSetIsNormalAttack) {
+        if (gameObject.name.ToString() == skillSetup.GetSetButtonSkillName) {
+            Input = zero;
+            handle.anchoredPosition = zero;
+            handle.gameObject.SetActive(false);
+            skillSetup.GetSetButtonSkillName = "";
             skillCommand.OnSkillCasted();
         }
     }

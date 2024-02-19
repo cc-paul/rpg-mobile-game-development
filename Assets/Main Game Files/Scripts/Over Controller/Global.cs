@@ -64,6 +64,12 @@ public class Global {
         Run
     }
 
+
+    /* Tags */
+    public const string PLAYER = "Player";
+    public const string PLAYER_OTHERS = "Player Others";
+    public const string MOB = "Mob";
+
     /* Swordsman Skill Icon */
     public enum SwordsmanSkillIcon {
         icon_ice_crack,
@@ -75,6 +81,16 @@ public class Global {
         icon_ice_down_wave
     }
 
+    /* Target Indicator */
+    public enum TargetIndicator {
+        Area,
+        Line
+    }
+
+    /* Offset */
+    public const float RANGE_OFFSET = 3.6f;
+    public const float RANGE_OFFSET_TARGET = 3f;
+
     /* Game Object */
     public const string GENERAL_SETTINGS = "General Settings";
     public const string BUTTON_SKILL_NAME = "Button Skill Slot #";
@@ -82,6 +98,17 @@ public class Global {
     public const string HANDLE = "Handle";
     public const string TIMER_IMAGE = "Timer Image";
     public const string COUNTER = "Counter";
+    public const string ICON_DRAG = "Icon Drag";
+    public const string DRAGGABLE_ICON_HOLDER = "Draggable Icon Holder";
+    public const string ICON_FIX = "Icon Fix";
+    public const string ICON = "Icon";
+    public const string CONTENT = "Content";
+    public const string SKILL_NAME_VALUE = "Skill Value";
+    public const string LEVEL_NAME_VALUE = "Level Value";
+    public const string QUICK_SLOT = "Quick Slot ";
+    public const string BORDER = "Border";
+    public const string BASIC_INFO_UI = "Basic Info UI";
+    public const string TARGET_INDICATOR = "Target Indicator";
 
     /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";
