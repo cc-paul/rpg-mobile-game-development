@@ -4,14 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class AnimationClipInfo {
-    public Global.SwordsmanNormalAnimation swordsmanNormalAnimationName;
-    public AnimationClip animationClip;
+public class AnimationClipInfo<TEnum> where TEnum : System.Enum {
+    public TEnum animationName;
     public ClipTransition clipTransition;
 
-    public AnimationClipInfo(Global.SwordsmanNormalAnimation _swordsmanNormalAnimationName, AnimationClip _animationClip, ClipTransition _clipTransition) {
-        swordsmanNormalAnimationName = _swordsmanNormalAnimationName;
-        animationClip = _animationClip;
+    public AnimationClipInfo(TEnum _animationName, ClipTransition _clipTransition) {
+        animationName = _animationName;
         clipTransition = _clipTransition;
     }
 }

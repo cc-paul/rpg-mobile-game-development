@@ -45,6 +45,7 @@ public class PlayerStatsManager : MonoBehaviour {
     private PlayerStatsController playerStatsController;
     private Coroutine regenMPCourotine;
     private Coroutine regenHPCourotine;
+    private bool isPlayerDead;
 
     #region Character GetSet Properties
     public Global.Characters GetSetCharacterType {
@@ -101,6 +102,11 @@ public class PlayerStatsManager : MonoBehaviour {
         get { return regenMPCourotine; }
         set { regenMPCourotine = value; }
     }
+
+    public bool GetSetIsPlayerDead {
+        get { return isPlayerDead; }
+        set { isPlayerDead = value; }
+    }
     #endregion
 
     private void Awake() {
@@ -127,7 +133,7 @@ public class PlayerStatsManager : MonoBehaviour {
     }
 
     public IEnumerator RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
-        while (stat.Value < maxStat.Value && (int)stat.Value != 0) {
+        while (stat.Value < maxStat.Value && stat.Value > 0) {
             StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
             stat.AddModifier(regenModifier);
 

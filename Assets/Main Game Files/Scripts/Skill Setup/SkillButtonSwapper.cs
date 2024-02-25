@@ -5,10 +5,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class SkillButtonSwapper : MonoBehaviour {
+    [Header("Game Object and Others")]
+    [SerializeField] private GameObject skillSettings;
+    [SerializeField] private GameObject skillButtonParent;
+
     [Header("UI")]
     [SerializeField] private Button buttonSwap;
+    [SerializeField] private GameObject line1;
+    [SerializeField] private GameObject line2;
+    [SerializeField] private GameObject line3;
 
-    private GameObject skillButtonParent;
+    private TargetManager targetManager;
     private GameObject currentSkillButton;
     private int skillButtonListCount;
     private int startNumber = 1;
@@ -18,7 +25,7 @@ public class SkillButtonSwapper : MonoBehaviour {
     private float textSize = 36;
 
     private void Awake() {
-        skillButtonParent = gameObject;
+        targetManager = skillSettings.GetComponent<TargetManager>();
     }
 
     private void Start() {
@@ -36,6 +43,8 @@ public class SkillButtonSwapper : MonoBehaviour {
                 endNumber = 4;
             }
 
+            targetManager.HideTargetContainer();
+            targetManager.HideAllTargetIndicators();
             UpdateSkillButtonList();
         });
     }
@@ -48,6 +57,10 @@ public class SkillButtonSwapper : MonoBehaviour {
 
             HideShowButtonSkill(currentSkillButton, i >= startNumber && i <= endNumber);
         }
+
+        line1.SetActive(endNumber == 4);
+        line2.SetActive(endNumber == 8);
+        line3.SetActive(endNumber == 12);
     }
 
     private void HideShowButtonSkill(GameObject currentButton, bool showIt) {

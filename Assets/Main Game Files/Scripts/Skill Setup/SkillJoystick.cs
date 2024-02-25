@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
     [Header("Game Objects and otherts")]
+    [SerializeField] private GameObject generalSettings;
     [SerializeField] private GameObject skillSettings;
 
     [Space(2)]
@@ -22,14 +24,18 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     [SerializeField] private Global.AxisOptions axisOptions = Global.AxisOptions.Both;
     [SerializeField] private RectTransform background = null;
     [SerializeField] private RectTransform handle = null;
+    [SerializeField] private Button buttonCancelSkill;
 
     [Space(2)]
 
     [Header("Components")]
     [SerializeField] private SkillSetup skillSetup;
 
+    private PlayerStatsManager playerStatsManager;
     private TargetManager targetManager;
     private SkillCommand skillCommand;
+    private SkillReference skillReference;
+    private SkillBaseCast skillBaseCast;
     private RectTransform baseRect = null;
     private Canvas canvas;
     private Camera cam;
@@ -93,7 +99,10 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
     #endregion
 
     private void Awake() {
+        playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
+        skillReference = skillSettings.GetComponent<SkillReference>();
         targetManager = skillSettings.GetComponent<TargetManager>();
+        skillBaseCast = skillSettings.GetComponent<SkillBaseCast>();
         skillCommand = GetComponent<SkillCommand>();
     }
 
@@ -120,14 +129,30 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
 
     public virtual void OnPointerDown(PointerEventData eventData) {
         if (skillCommand.GetSetSkillID == -1) return;
-        if (skillCommand.GetSetIsCoolingDown) return;
+        if (playerStatsManager.GetSetIsPlayerDead) {
+            skillCommand.ResetTargetting();
+            ResetSkillJoyStick();
+            return;
+        }
+        if (skillCommand.GetSetIsCoolingDown) {
+            skillCommand.GetSetMessageBoxManager.ShowMessage(currentMessage: Global.MESSAGE_COOLDOWN);
+            return;
+        }
+        if (playerStatsManager.MP.Value < skillReference.GetSetMPConsumption(skillID: skillCommand.GetSetSkillID)) {
+            skillCommand.GetSetMessageBoxManager.ShowMessage(currentMessage: Global.MESSAGE_NO_MANA);
+            return;
+        }
+        if (skillReference.GetRequiresWeapon(skillID: skillCommand.GetSetSkillID) && !playerStatsManager.GetSetHasWeapon) {
+            skillCommand.GetSetMessageBoxManager.ShowMessage(currentMessage: Global.MESSAGE_NO_WEAPON);
+            return;
+        }
+        if (skillBaseCast.GetSetIsCastingSkill) return;
         
         skillSetup.SetPrimarySkillButton(gameObject.name.ToString());
 
         if (gameObject.name.ToString() == skillSetup.GetSetButtonSkillName) {
-            //if (!movement.GetSetIsInSkillAnimation) {
-                targetManager.ClearTargetList(true);
-            //}
+            skillReference.GetSetCancelSkill = false;
+            targetManager.ClearTargetList(includeFinal: true);
             skillCommand.OnBeforeCast();
             OnDrag(eventData);
         }
@@ -135,7 +160,13 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
 
     public void OnDrag(PointerEventData eventData) {
         if (skillCommand.GetSetSkillID == -1) return;
+        if (playerStatsManager.GetSetIsPlayerDead) {
+            skillCommand.ResetTargetting();
+            ResetSkillJoyStick();
+            return;
+        }
         if (skillCommand.GetSetIsCoolingDown) return;
+        if (skillBaseCast.GetSetIsCastingSkill) return;
 
         if (gameObject.name.ToString() != skillSetup.GetSetButtonSkillName) {
             skillSetup.SetPrimarySkillButton(skillSetup.GetSetButtonSkillName);
@@ -153,21 +184,48 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
             HandleInput(Input.magnitude, Input.normalized, radius, cam);
             handle.anchoredPosition = Input * radius * handleRange;
             handle.gameObject.SetActive(true);
+            buttonCancelSkill.gameObject.SetActive(true);
             skillCommand.OnCastingSkill(skillJoystick: this);
         }
     }
 
     public virtual void OnPointerUp(PointerEventData eventData) {
         if (skillCommand.GetSetSkillID == -1) return;
+        if (playerStatsManager.GetSetIsPlayerDead) {
+            skillCommand.ResetTargetting();
+            ResetSkillJoyStick();
+            return;
+        }
         if (skillCommand.GetSetIsCoolingDown) return;
+        if (skillBaseCast.GetSetIsCastingSkill) return;
 
         if (gameObject.name.ToString() == skillSetup.GetSetButtonSkillName) {
-            Input = zero;
-            handle.anchoredPosition = zero;
-            handle.gameObject.SetActive(false);
+            ResetSkillJoyStick();
             skillSetup.GetSetButtonSkillName = "";
-            skillCommand.OnSkillCasted();
+
+            if (!targetManager.IsThereAnEnemy() && !skillReference.GetSetCancelSkill) {
+                skillCommand.GetSetMessageBoxManager.ShowMessage(currentMessage: Global.MESSAGE_NO_TARGET);
+            };
+
+            if (
+                !skillReference.GetSetCancelSkill && 
+                targetManager.IsThereAnEnemy() &&
+                !skillBaseCast.GetSetIsCastingSkill &&
+                playerStatsManager.MP.Value > skillReference.GetSetMPConsumption(skillID: skillCommand.GetSetSkillID)
+            ) {
+                skillReference.GetSetCancelSkill = false;
+                skillCommand.OnSkillCasted();
+            }
+
+            skillCommand.ResetTargetting();
         }
+    }
+
+    private void ResetSkillJoyStick() {
+        Input = zero;
+        handle.anchoredPosition = zero;
+        handle.gameObject.SetActive(false);
+        buttonCancelSkill.gameObject.SetActive(false);
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam) {

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class MovementController : MonoBehaviour {
     [Header("Game Object and Others")]
+    [SerializeField] private GameObject skillSettings;
     [SerializeField] private GameObject controller;
     [SerializeField] private GameObject model;
     [SerializeField] private GameObject targetIndicators;
@@ -25,6 +26,7 @@ public class MovementController : MonoBehaviour {
     private PlayerStatsManager playerStatsManager;
     private BasicAnimation basicAnimation;
     private TargetPositioning skillTargetPositioning;
+    private SkillBaseCast skillBaseCast;
 
     private Vector2 input;
     private Vector2 inputDir;
@@ -58,6 +60,7 @@ public class MovementController : MonoBehaviour {
         characterController = controller.GetComponent<CharacterController>();
         basicAnimation = GetComponent<BasicAnimation>();
         playerStatsManager = GetComponent<PlayerStatsManager>();
+        skillBaseCast = skillSettings.GetComponent<SkillBaseCast>();
         cameraTransform = Camera.main.transform;
     }
 
@@ -98,6 +101,13 @@ public class MovementController : MonoBehaviour {
 
             inputDir = input.normalized;
 
+            if ((
+                skillBaseCast.GetSetIsCastingSkill && !skillBaseCast.GetSetEnableCancelingSkill) ||
+                playerStatsManager.GetSetIsPlayerDead
+            ) {
+                break;
+            }
+
             if (inputDir == Vector2.zero) {
                 basicAnimation.PlayBasicAnimation(_animationCategory: Global.AnimationCategory.Idle);
                 skillTargetPositioning.RepositionTargetIndicator();
@@ -128,7 +138,9 @@ public class MovementController : MonoBehaviour {
 
             characterController.Move(velocity * Time.deltaTime);
             basicAnimation.PlayBasicAnimation(_animationCategory: isRunning ? Global.AnimationCategory.Run : Global.AnimationCategory.Walk);
+            skillBaseCast.GetSetIsCastingSkill = false;
             skillTargetPositioning.RepositionTargetIndicator();
+            
 
             yield return null;
         }

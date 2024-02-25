@@ -5,8 +5,12 @@ using UnityEngine;
 public class AreaTarget : MonoBehaviour {
     [Header("Game object and others")]
     [SerializeField] private GameObject myCamera;
+    [SerializeField] private GameObject generalSettings;
+    [SerializeField] private GameObject skillSettings;
+    [SerializeField] private GameObject bottomPosition;
     [SerializeField] private RectTransform parentAreaTarget;
     [SerializeField] private RectTransform childAreaTarget;
+    
 
     [Space(2)]
 
@@ -17,12 +21,13 @@ public class AreaTarget : MonoBehaviour {
     private RangeAdjust rangeAdjust;
     private CapsuleCollider parentCapsuleCollider;
     private CapsuleCollider childCapsuleCollider;
-    
+    private TargetManager targetManager;
 
     private void Awake() {
         parentCapsuleCollider = parentAreaTarget.GetComponent<CapsuleCollider>();
         childCapsuleCollider = childAreaTarget.GetComponent<CapsuleCollider>();
         rangeAdjust = gameObject.transform.parent.gameObject.GetComponent<RangeAdjust>();
+        targetManager = skillSettings.GetComponent<TargetManager>();
     }
 
     public void ControlTheChildTarget(SkillJoystick skillJoystick) {
@@ -36,11 +41,23 @@ public class AreaTarget : MonoBehaviour {
     }
     
     public void ResizeTheCollider() {
-        parentCapsuleCollider.radius = parentAreaTarget.rect.width / 2f;
+        parentCapsuleCollider.radius = parentAreaTarget.rect.width / 2f - 0.5f;
         childCapsuleCollider.radius = childAreaTarget.rect.width / 2f;
     }
 
-    public void SetTargetToTheNearestEnemy() {
-        //TODOO: Set the child target indicator on the nearest target
+    public IEnumerator SetTargetToTheNearestEnemy(SkillJoystick skillJoystick) {
+        yield return new WaitForSeconds(0.001f);
+
+        Vector3 newPosition = targetManager.GetSetNearestTargetPosition;
+        Vector3 myCurrentPosition = targetManager.GetSetPlayerPosition;
+        Vector3 direction = newPosition - myCurrentPosition;
+        float distance = direction.magnitude;
+        radius = rangeAdjust.GetSetRange * Global.RANGE_OFFSET;
+
+        if (distance > radius || targetManager.GetSetNearestTarget == null) {
+            ControlTheChildTarget(skillJoystick: skillJoystick);
+        } else {
+            transform.position = newPosition;
+        }
     }
 }

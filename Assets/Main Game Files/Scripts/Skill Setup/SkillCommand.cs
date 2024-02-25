@@ -11,6 +11,7 @@ public class SkillCommand : MonoBehaviour {
 
     [Header("Game Objects and otherts")]
     [SerializeField] private GameObject gameManager;
+    [SerializeField] private GameObject generalSettings;
     [SerializeField] private GameObject skillSettings;
     [SerializeField] private GameObject border;
     [SerializeField] private GameObject lineTargetIndicator;
@@ -20,6 +21,10 @@ public class SkillCommand : MonoBehaviour {
     [SerializeField] private bool isNormalAttack;
 
     private GameObject currentTargetIndicator;
+    private MessageBoxManager messageBoxManager;
+    private SkillBaseCast skillBaseCast;
+    private PlayerStatsManager playerStatsManager;
+    private PlayerStatsController playerStatsController;
     private TargetManager targetManager;
     private SkillSetup skillSetup;
     private SkillReference skillReference;
@@ -33,6 +38,7 @@ public class SkillCommand : MonoBehaviour {
     private bool isSkillCasted = false;
     private bool showTimerImage;
     private bool isCoolingDown;
+    private int dragCounter = 0;
 
     #region GetSet Properties
     public int GetSetSkillID {
@@ -54,13 +60,22 @@ public class SkillCommand : MonoBehaviour {
         get { return isCoolingDown; }
         set { isCoolingDown = value; }
     }
+
+    public MessageBoxManager GetSetMessageBoxManager {
+        get { return messageBoxManager; }
+        set { messageBoxManager = value; }
+    }
     #endregion
 
     private void Awake() {
+        playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
+        playerStatsController = generalSettings.GetComponent<PlayerStatsController>();
         targetManager = skillSettings.GetComponent<TargetManager>();
         skillReference = skillSettings.GetComponent<SkillReference>();
+        skillBaseCast = skillSettings.GetComponent<SkillBaseCast>();
         skillSetup = skillSettings.GetComponent<SkillSetup>();
-        dateAndTime = gameManager.GetComponent<DateAndTime>();        
+        dateAndTime = gameManager.GetComponent<DateAndTime>();
+        messageBoxManager = gameManager.GetComponent<MessageBoxManager>();
     }
 
     private void Start() {
@@ -84,6 +99,7 @@ public class SkillCommand : MonoBehaviour {
             AreaTarget areaTarget = areaChildTarget.GetComponent<AreaTarget>();
             RangeAdjust rangeAdjust = areaParentTarget.GetComponent<RangeAdjust>();
 
+            targetManager.GetSetNearestTarget = null;
             rangeAdjust.GetSetRange = scale;
             rangeAdjust.DoTheRescaling();
             areaTarget.ResizeTheCollider();
@@ -102,7 +118,13 @@ public class SkillCommand : MonoBehaviour {
             GameObject childTarget = areaParentTarget.transform.GetChild(0).gameObject;
             AreaTarget areaTarget = childTarget.GetComponent<AreaTarget>();
 
-            areaTarget.ControlTheChildTarget(skillJoystick: skillJoystick);
+            dragCounter++;
+
+            if (dragCounter > 2) {
+                areaTarget.ControlTheChildTarget(skillJoystick: skillJoystick);
+            } else {
+                StartCoroutine(areaTarget.SetTargetToTheNearestEnemy(skillJoystick: skillJoystick));
+            }
         } else {
             GameObject lineParentTarget = currentTargetIndicator.transform.GetChild(0).gameObject;
             GameObject lineRangePivot = lineParentTarget.transform.GetChild(0).gameObject;
@@ -112,11 +134,21 @@ public class SkillCommand : MonoBehaviour {
         }
     }
 
-    public void OnSkillCasted() {
-        //TODO: Use the function below only after the player casted a skill
-        expectedCooldown = skillReference.GetSkillDefaultCoolDown(skillID: skillID);
+    public void ResetTargetting() {
         currentTargetIndicator.SetActive(false);
         targetManager.HideAllTargetIndicators();
+    }
+
+    public void OnSkillCasted() {
+        dragCounter = 0;
+        expectedCooldown = skillReference.GetSkillDefaultCoolDown(skillID: skillID);
+        
+        
+        skillBaseCast.CastSelectedSkill(_skillID: skillID);
+        currentTargetIndicator.SetActive(false);
+        targetManager.HideAllTargetIndicators();
+        playerStatsController.DeductMP(_mpAmount: skillReference.GetSetMPConsumption(skillID: skillID));
+
         SetSkillLastUse();
         InitializeCooldown();
     }

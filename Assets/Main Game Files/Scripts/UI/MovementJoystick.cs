@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
+    [Header("Game Object and Others")]
+    [SerializeField] private GameObject generalSettings;
+    [SerializeField] private GameObject skillSettings;
+
+
     [Header("Variable Declaration and Adjustment")]
     [SerializeField] private float handleRange = 1;
     [SerializeField] private float deadZone = 0;
@@ -23,6 +28,8 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     [Header("Components")]
     [SerializeField] private MovementController movementController;
 
+    private PlayerStatsManager playerStatsManager;
+    private SkillBaseCast skillBaseCast;
     private MovementArrowIndicator movementArrowIndicator;
     private RectTransform baseRect = null;
     private Canvas canvas;
@@ -87,7 +94,9 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     #endregion
 
     private void Awake() {
+        skillBaseCast = skillSettings.GetComponent<SkillBaseCast>();
         movementArrowIndicator = GetComponent<MovementArrowIndicator>();
+        playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
     }
 
 
@@ -111,10 +120,29 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     }
 
     public virtual void OnPointerDown(PointerEventData eventData) {
+        if ((
+            skillBaseCast.GetSetIsCastingSkill && !skillBaseCast.GetSetEnableCancelingSkill) || 
+            playerStatsManager.GetSetIsPlayerDead
+        ) {
+            ResetAnchorToZero();
+            movementArrowIndicator.HideShowArrow(showArrow: false);
+            return;
+        }
+
         OnDrag(eventData);
     }
 
     public void OnDrag(PointerEventData eventData) {
+        if ((
+            skillBaseCast.GetSetIsCastingSkill && !skillBaseCast.GetSetEnableCancelingSkill) ||
+            playerStatsManager.GetSetIsPlayerDead
+        ) {
+            ResetAnchorToZero();
+            movementArrowIndicator.HideShowArrow(showArrow: false);
+            return;
+        }
+
+
         cam = null;
         if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
             cam = canvas.worldCamera;
@@ -132,11 +160,23 @@ public class MovementJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler
     }
 
     public virtual void OnPointerUp(PointerEventData eventData) {
+        if ((
+            skillBaseCast.GetSetIsCastingSkill && !skillBaseCast.GetSetEnableCancelingSkill) ||
+            playerStatsManager.GetSetIsPlayerDead
+        ) {
+            ResetAnchorToZero();
+            movementArrowIndicator.HideShowArrow(showArrow: false);
+            return;
+        }
+
+        ResetAnchorToZero();
+        movementController.InitiatePlayerMovement();
+        movementArrowIndicator.HideShowArrow(showArrow: false);
+    }
+
+    private void ResetAnchorToZero() {
         Input = zero;
         handle.anchoredPosition = zero;
-
-        movementController.InitiatePlayerMovement();
-        movementArrowIndicator.HideShowArrow(false);
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam) {

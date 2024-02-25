@@ -53,6 +53,18 @@ public class Global {
         Death_Sword
     }
 
+    /* Swordsman Skills Animation */
+    public enum SwordsmanSkillAnimation {
+        Ground_Impact,
+        Lightning_Ball,
+        Ice_Crack,
+        Lightning_Strike,
+        Health_Up,
+        Speed_Up,
+        Ice_Down_Wave,
+        Whirlwind
+    }
+
     public enum GameTags {
         Player
     }
@@ -64,12 +76,6 @@ public class Global {
         Run
     }
 
-
-    /* Tags */
-    public const string PLAYER = "Player";
-    public const string PLAYER_OTHERS = "Player Others";
-    public const string MOB = "Mob";
-
     /* Swordsman Skill Icon */
     public enum SwordsmanSkillIcon {
         icon_ice_crack,
@@ -78,7 +84,8 @@ public class Global {
         icon_lightning_strike,
         icon_health_up,
         icon_speed_up,
-        icon_ice_down_wave
+        icon_ice_down_wave,
+        icon_whirlwind
     }
 
     /* Target Indicator */
@@ -86,6 +93,18 @@ public class Global {
         Area,
         Line
     }
+
+    public enum EnemyAnimation {
+        Enemy_Idle,
+        Enemy_Attack,
+        Enemy_Run,
+        Enemy_Walk
+    }
+
+    /* Tags */
+    public const string PLAYER = "Player";
+    public const string PLAYER_OTHERS = "Player Others";
+    public const string MOB = "Mob";
 
     /* Offset */
     public const float RANGE_OFFSET = 3.6f;
@@ -108,9 +127,19 @@ public class Global {
     public const string QUICK_SLOT = "Quick Slot ";
     public const string BORDER = "Border";
     public const string BASIC_INFO_UI = "Basic Info UI";
+    public const string BASIC_INFO_UI_V2 = "Basic Info UI V2";
+    public const string MOBS_INFO_UI = "Mobs Info UI";
     public const string TARGET_INDICATOR = "Target Indicator";
+    public const string CONTROLLER = "Controller";
+    public const string DUMMY = "Dummy Only";
 
     /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";
     public const string PREFS_SKILLNO_ = "Prefs_Skill_No_";
+
+    /* Message */
+    public const string MESSAGE_NO_MANA = "Unable to cast skill, no mana";
+    public const string MESSAGE_COOLDOWN = "Unable to cast skill, please wait for the cooldown";
+    public const string MESSAGE_NO_TARGET = "Please select a target";
+    public const string MESSAGE_NO_WEAPON = "Please equip a weapon to cast a skill";
 }

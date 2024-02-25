@@ -12,6 +12,7 @@ public class PlayerStatsController : MonoBehaviour {
 
     private StatModifier damageStat;
     private StatModifier healthStat;
+    private StatModifier mpStat;
 
     #region GetSet Properties
     public Component GetSetSourceComponent {
@@ -49,7 +50,7 @@ public class PlayerStatsController : MonoBehaviour {
 
             }
         } else {
-            RegenThePlayer();
+            RegenHP();
         }
     }
 
@@ -57,6 +58,13 @@ public class PlayerStatsController : MonoBehaviour {
         healthStat = new StatModifier(_healthAmount, Global.StatModType.Flat, this);
         playerStatsManager.Health.AddModifier(healthStat);
         UpdateHealthUI();
+    }
+
+    public void DeductMP(float _mpAmount) {
+        mpStat = new StatModifier(-_mpAmount, Global.StatModType.Flat, this);
+        playerStatsManager.MP.AddModifier(mpStat);
+        UpdateHealthUI();
+        RegenMP();
     }
 
     private void DisplayCharacterDetails() {
@@ -76,7 +84,7 @@ public class PlayerStatsController : MonoBehaviour {
         );
     }
 
-    public void RegenThePlayer() {
+    public void RegenHP() {
         if (playerStatsManager.GetSetHPCoroutine != null) {
             StopCoroutine(playerStatsManager.GetSetHPCoroutine);
         }
@@ -89,6 +97,25 @@ public class PlayerStatsController : MonoBehaviour {
             )
         );
     }
+
+    public void RegenMP() {
+        if (playerStatsManager.GetSetMPCoroutine != null) {
+            StopCoroutine(playerStatsManager.GetSetMPCoroutine);
+        }
+
+        playerStatsManager.GetSetMPCoroutine = StartCoroutine(
+            playerStatsManager.RegenStatCoroutine(
+                playerStatsManager.MP,
+                playerStatsManager.MaxMP,
+                playerStatsManager.MPRegenValue
+            )
+        );
+    }
+
+    public float GetTotalBaseDamage() {
+        return playerStatsManager.BaseDamage.Value;
+    }
+
 
     public void InitializeContiniousDamage(Component _sourceComponent) {
         sourceComponent = _sourceComponent;
