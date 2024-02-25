@@ -16,6 +16,7 @@ public class SkillReference : MonoBehaviour {
     private BaseResponse<BaseResponseData<SkillPattern>> playerSkillList = new BaseResponse<BaseResponseData<SkillPattern>>();
     private List<SkillType> skillTypeList = new List<SkillType>();
     private int finalSkillID;
+    private bool cancelSkill;
     
 
     #region GetSet Properties
@@ -32,6 +33,11 @@ public class SkillReference : MonoBehaviour {
     public int GetSetFinalSkillID {
         get { return finalSkillID; }
         set { finalSkillID = value; }
+    }
+
+    public bool GetSetCancelSkill {
+        get { return cancelSkill; }
+        set { cancelSkill = value; }
     }
     #endregion
 

@@ -6,9 +6,12 @@ using UnityEngine;
 
 public class TargetManager : MonoBehaviour {
     [Header("Game Object and Others")]
-    [SerializeField] private GameObject playerModel;
+    [SerializeField] private GameObject areaTargetContainer;
+    [SerializeField] private GameObject lineRangeContainer;
+    [SerializeField] private GameObject controller;
     [SerializeField] private GameObject generalSettings;
     [SerializeField] private GameObject skillSettings;
+    [SerializeField] private GameObject lineSkillLook;
 
     private List<GameObject> finalTargetList = new List<GameObject>();
     private List<GameObject> parentTargetList = new List<GameObject>();
@@ -28,6 +31,11 @@ public class TargetManager : MonoBehaviour {
         set { nearestTarget = value; }
     }
 
+    public GameObject GetSetLineSkillLook {
+        get { return lineSkillLook; }
+        set { lineSkillLook = value; }
+    }
+
     public float GetSetNearestTargetDistance {
         get { return nearestTargetDistance; }
         set { nearestTargetDistance = value; }
@@ -36,6 +44,11 @@ public class TargetManager : MonoBehaviour {
     public Vector3 GetSetNearestTargetPosition {
         get { return nearestTargetPosition; }
         set { nearestTargetPosition = value; }
+    }
+
+    public Vector3 GetSetPlayerPosition {
+        get { return controller.transform.position; }
+        set { controller.transform.position = value; }
     }
     #endregion 
 
@@ -124,11 +137,14 @@ public class TargetManager : MonoBehaviour {
         foreach (GameObject currentTarget in finalTargetList.ToArray()) {
             ShowHideTargetIndicators(currentTarget, true);
         }
+
+        if (finalTargetList.Count != 0) {
+            GetTheNearestTarget();
+        }
     }
 
     public void ShowHideTargetIndicators(GameObject target, bool showIt) {
         if (target != null) {
-            forAlly = skillReference.GetSkillForAlly(skillReference.GetSetFinalSkillID);
             Transform targetIndicator = target.transform.Find(Global.TARGET_INDICATOR);
 
             if (targetIndicator != null) {
@@ -145,6 +161,11 @@ public class TargetManager : MonoBehaviour {
         }
     }
 
+    public void HideTargetContainer() {
+        lineRangeContainer.SetActive(false);
+        areaTargetContainer.SetActive(false);
+    }
+
     public void HideAllTargetIndicators() {
         if (finalTargetList.Count != 0) {
             foreach (GameObject currentTarget in finalTargetList.ToArray()) {
@@ -155,7 +176,7 @@ public class TargetManager : MonoBehaviour {
 
     public void GetTheNearestTarget() {
         Dictionary<GameObject, Vector3> targetPosition = new Dictionary<GameObject, Vector3>();
-        Vector3 myCurrentPosition = playerModel.transform.position;
+        Vector3 myCurrentPosition = controller.transform.position;
         nearestTargetDistance = Mathf.Infinity;
         nearestTarget = null;
 
@@ -181,11 +202,11 @@ public class TargetManager : MonoBehaviour {
         //if (finalTargetIndicator.CancelSkill) return;
         if (nearestTarget == null || forAlly) return;
 
-        Vector3 directionToTarget = (nearestTarget.transform.position - playerModel.transform.position).normalized;
+        Vector3 directionToTarget = (nearestTarget.transform.position - controller.transform.position).normalized;
 
         if (directionToTarget.sqrMagnitude > 0.0001f) {
             Quaternion yOnlyRotation = Quaternion.LookRotation(new Vector3(directionToTarget.x, 0, directionToTarget.z));
-            playerModel.transform.rotation = yOnlyRotation;
+            controller.transform.rotation = yOnlyRotation;
         }
     }
 }

@@ -5,7 +5,12 @@ using UnityEngine;
 
 public class AnimationPlayer : MonoBehaviour {
     [Header("Swordsman Normal Animation")]
-    [SerializeField] private List<AnimationClipInfo> swordsmanNormalAttackAnimation = new List<AnimationClipInfo>();
+    [SerializeField] private List<AnimationClipInfo<Global.SwordsmanNormalAnimation>> swordsmanNormalAttackAnimation = new List<AnimationClipInfo<Global.SwordsmanNormalAnimation>>();
+
+    [Space(2)] 
+    
+    [Header("Swordsman Skill Animations")]
+    [SerializeField] private List<AnimationClipInfo<Global.SwordsmanSkillAnimation>> swordsmanSkillAttackAnimation = new List<AnimationClipInfo<Global.SwordsmanSkillAnimation>>();
 
     [Space(2)]
 
@@ -13,30 +18,38 @@ public class AnimationPlayer : MonoBehaviour {
     [SerializeField] private AnimancerComponent animancerComponent;
 
     private PlayerStatsManager playerStatsManager;
-    private AnimationClip animationClip;
-    private AnimationClipInfo animationClipInfo;
 
     private void Awake() {
         playerStatsManager = GetComponent<PlayerStatsManager>();
     }
 
     public void PlayAnimationByName(string _currentAnimationName,bool _isNormalAnimation) {
-        animationClip = null;
+        ClipTransition currentClipTransition = null;
 
-        if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
-            if (_isNormalAnimation) {
-                animationClipInfo = swordsmanNormalAttackAnimation.Find(
-                    clipInfo => clipInfo.swordsmanNormalAnimationName.ToString() == _currentAnimationName
+        if (_isNormalAnimation) {
+            var animationClipInfo = swordsmanNormalAttackAnimation.Find(
+                clipInfo => clipInfo.animationName.ToString() == _currentAnimationName
+            );
+
+            if (animationClipInfo != null) {
+                currentClipTransition = animationClipInfo.clipTransition;
+            }
+        } else {
+            if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
+                var animationClipInfo = swordsmanSkillAttackAnimation.Find(
+                    clipInfo => clipInfo.animationName.ToString() == _currentAnimationName
                 );
 
                 if (animationClipInfo != null) {
-                    animationClip = animationClipInfo.animationClip;
+                    currentClipTransition = animationClipInfo.clipTransition;
                 }
             }
         }
 
-
-        if (animationClip == null) return;
-        animancerComponent.Play(animationClip);
+        if (currentClipTransition != null) {
+            animancerComponent.Play(currentClipTransition);
+        } else {
+            Debug.LogWarning("Animation not found: " + _currentAnimationName);
+        }
     }
 }
