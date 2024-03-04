@@ -62,7 +62,8 @@ public class Global {
         Health_Up,
         Speed_Up,
         Ice_Down_Wave,
-        Whirlwind
+        Whirlwind,
+        Lightning_Orb
     }
 
     public enum GameTags {
@@ -132,6 +133,7 @@ public class Global {
     public const string TARGET_INDICATOR = "Target Indicator";
     public const string CONTROLLER = "Controller";
     public const string DUMMY = "Dummy Only";
+    public const string NUMBER_CONTAINER = "Number Container";
 
     /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";

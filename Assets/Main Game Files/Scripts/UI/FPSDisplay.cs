@@ -11,7 +11,7 @@ public class FPSDisplay : MonoBehaviour {
     private float deltaTime = 0f;
     private float fps;
     private float msec;
-    private int targetFPS = 120;
+    private int targetFPS = 30;
     private int roundedFps;
     private int roundedMsec;
     private string textFps;

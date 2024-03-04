@@ -10,6 +10,7 @@ using UnityEngine.Pool;
 
 public class LightningStrike : MonoBehaviour {
     [Header("Skill Effect Prefab")]
+    [SerializeField] private GameObject cloudPrefab;
     [SerializeField] private GameObject magicCirclePrefab;
     [SerializeField] private GameObject lightningStrikePrefab;
 
@@ -34,6 +35,13 @@ public class LightningStrike : MonoBehaviour {
             _currentAnimationName: Global.SwordsmanSkillAnimation.Lightning_Strike.ToString(),
             _isNormalAnimation: false
         );
+    }
+
+    public void ShowCloud() {
+        GameObject cloud = skillBaseCast.GetSetObjectPoolManager.SpawnFromPool(cloudPrefab.name.ToString());
+        cloud.transform.position = skillBaseCast.GetSetTargetManager.GetSetPlayerPosition;
+        cloud.SetActive(true);
+        cloud.GetComponent<ReturnObjectToPool>().InitializeReturn(spawnedObject: cloud);
     }
 
     public void ShowMagicCircle() {

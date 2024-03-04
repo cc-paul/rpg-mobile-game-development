@@ -74,7 +74,7 @@
 								"baseDamage" : 200,
 								"indicatorType" : "Area",
 								"maxTarget" : 5,
-								"areaRange" : 1.2,
+								"areaRange" : 1.5,
 								"includeInSkillList" : true,
 								"addedHP" : 0,
 								"forAlly" : false,

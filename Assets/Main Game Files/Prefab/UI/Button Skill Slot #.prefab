@@ -156,8 +156,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 7889dfadaf64a074d957dcce878fa38d, type: 2}
+  m_sharedMaterial: {fileID: -5725376461756623916, guid: 7889dfadaf64a074d957dcce878fa38d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -363,7 +363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillBackground: {fileID: 2919321648195987350}
   timerImageCooldown: {fileID: 8350152309210890782}
-  defaultBackground: {fileID: 21300000, guid: 9c5547392ba045349b694934fc0b3b7f, type: 3}
+  defaultBackground: {fileID: 21300000, guid: 6227b8360908b0f488e0cd7d5f4bce1d, type: 3}
   gameManager: {fileID: 0}
   generalSettings: {fileID: 0}
   skillSettings: {fileID: 0}

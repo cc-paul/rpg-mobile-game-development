@@ -41,6 +41,8 @@ public class SkillBaseCast : MonoBehaviour {
     private LightningStrike lightningStrike;
     private GroundImpact groundImpact;
     private Whirlwind whirlwind;
+    private LightningOrb lightningOrb;
+    private IceDownWave iceDownWave;
 
     #region GetSet Properties
     public int GetSetSkillID {
@@ -116,6 +118,8 @@ public class SkillBaseCast : MonoBehaviour {
         lightningStrike = swordsmanSkills.GetComponent<LightningStrike>();
         groundImpact = swordsmanSkills.GetComponent<GroundImpact>();
         whirlwind = swordsmanSkills.GetComponent<Whirlwind>();
+        lightningOrb = swordsmanSkills.GetComponent<LightningOrb>();
+        iceDownWave = swordsmanSkills.GetComponent<IceDownWave>();
     }
 
     public void CastSelectedSkill(int _skillID) {
@@ -127,13 +131,19 @@ public class SkillBaseCast : MonoBehaviour {
             break;
             case 2:
                 groundImpact.ActivateSkill();
-                break;
+            break;
+            case 3:
+                lightningOrb.ActivateSkill();
+            break;
             case 4:
                 lightningStrike.ActivateSkill();
             break;
+            case 7:
+                iceDownWave.ActivateSkill();
+            break;
             case 8:
                 whirlwind.ActivateSkill();
-                break;
+            break;
         }
     }
 

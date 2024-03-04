@@ -75,6 +75,8 @@ public class BasicAnimation : MonoBehaviour {
             _currentAnimationName: animationToPlay,
             _isNormalAnimation: true
         );
+
+        animationPlayer.HideCastProgress();
     }
 
     public void InitializeRerturnToNonCombat() {
