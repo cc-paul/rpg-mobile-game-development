@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1093699247614633357}
   - component: {fileID: 2755520830520226052}
+  - component: {fileID: 8480011183223732649}
   m_Layer: 13
   m_Name: Damage Text Holder
   m_TagString: Untagged
@@ -47,6 +48,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 0.8
   useClipTransitionDuration: 0
+--- !u!114 &8480011183223732649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2406073756659405212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa07edfd52dbb84191a5b7286fd3f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameTagInfoList:
+  - uiTag: {fileID: 1093699247614633357}
+    isHP: 0
 --- !u!1 &5256225516453129201
 GameObject:
   m_ObjectHideFlags: 0
@@ -163,8 +179,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 200
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 7889dfadaf64a074d957dcce878fa38d, type: 2}
+  m_sharedMaterial: {fileID: -5725376461756623916, guid: 7889dfadaf64a074d957dcce878fa38d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

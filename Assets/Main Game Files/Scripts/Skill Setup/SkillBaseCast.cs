@@ -33,6 +33,7 @@ public class SkillBaseCast : MonoBehaviour {
     private PlayerStatsController playerStatsController;
     private TagLookAtCamera tagLookAtCamera;
     private SkillReference skillReference;
+    private ObjectPoolManager buffEffectPool;
 
     private Coroutine coroutineCancelDelay;
 
@@ -41,6 +42,11 @@ public class SkillBaseCast : MonoBehaviour {
     private LightningStrike lightningStrike;
     private GroundImpact groundImpact;
     private Whirlwind whirlwind;
+    private LightningOrb lightningOrb;
+    private IceDownWave iceDownWave;
+    private SpeedUp speedUp;
+    private HealthUp healthUp;
+    private BerserkAura berserkAura;
 
     #region GetSet Properties
     public int GetSetSkillID {
@@ -116,6 +122,11 @@ public class SkillBaseCast : MonoBehaviour {
         lightningStrike = swordsmanSkills.GetComponent<LightningStrike>();
         groundImpact = swordsmanSkills.GetComponent<GroundImpact>();
         whirlwind = swordsmanSkills.GetComponent<Whirlwind>();
+        lightningOrb = swordsmanSkills.GetComponent<LightningOrb>();
+        iceDownWave = swordsmanSkills.GetComponent<IceDownWave>();
+        speedUp = swordsmanSkills.GetComponent<SpeedUp>();
+        healthUp = swordsmanSkills.GetComponent<HealthUp>();
+        berserkAura = swordsmanSkills.GetComponent<BerserkAura>();
     }
 
     public void CastSelectedSkill(int _skillID) {
@@ -127,13 +138,28 @@ public class SkillBaseCast : MonoBehaviour {
             break;
             case 2:
                 groundImpact.ActivateSkill();
-                break;
+            break;
+            case 3:
+                lightningOrb.ActivateSkill();
+            break;
             case 4:
                 lightningStrike.ActivateSkill();
             break;
+            case 5:
+                healthUp.ActivateSkill();
+            break;
+            case 6:
+                speedUp.ActivateSkill();
+            break;
+            case 7:
+                iceDownWave.ActivateSkill();
+            break;
             case 8:
                 whirlwind.ActivateSkill();
-                break;
+            break;
+            case 9:
+                berserkAura.ActivateSkill();
+            break;
         }
     }
 
@@ -163,6 +189,5 @@ public class SkillBaseCast : MonoBehaviour {
         damageTextHolder.transform.position = damageTextPosition;
         damageTextHolder.SetActive(true);
         damageTextHolder.GetComponent<ReturnObjectToPool>().InitializeReturn(spawnedObject: damageTextHolder);
-        tagLookAtCamera.AddOnLookAtCamera(uiInfo: damageTextHolder.transform, uiIsHP: false);
     }
 }

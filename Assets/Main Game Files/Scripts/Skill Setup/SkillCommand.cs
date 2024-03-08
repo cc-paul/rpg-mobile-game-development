@@ -10,6 +10,7 @@ public class SkillCommand : MonoBehaviour {
     [SerializeField] private Sprite defaultBackground;
 
     [Header("Game Objects and otherts")]
+    [SerializeField] private GameObject controller;
     [SerializeField] private GameObject gameManager;
     [SerializeField] private GameObject generalSettings;
     [SerializeField] private GameObject skillSettings;
@@ -31,6 +32,7 @@ public class SkillCommand : MonoBehaviour {
     private DateAndTime dateAndTime;
     private Coroutine cooldownCoroutine;
     private int skillID = 0;
+    private int maxTarget = 0;
     private float expectedCooldown = 0;
     private float timer;
     private float percentage;
@@ -38,6 +40,7 @@ public class SkillCommand : MonoBehaviour {
     private bool isSkillCasted = false;
     private bool showTimerImage;
     private bool isCoolingDown;
+    private bool forAlly;
     private int dragCounter = 0;
 
     #region GetSet Properties
@@ -64,6 +67,11 @@ public class SkillCommand : MonoBehaviour {
     public MessageBoxManager GetSetMessageBoxManager {
         get { return messageBoxManager; }
         set { messageBoxManager = value; }
+    }
+
+    public GameObject GetSetController {
+        get { return controller; }
+        set { controller = value; }
     }
     #endregion
 
@@ -94,6 +102,7 @@ public class SkillCommand : MonoBehaviour {
 
         if (currentTargetIndicator == areaTargetIndicator) {
             float scale = skillReference.GetSkillTargetRanger(skillID: skillID);
+
             GameObject areaParentTarget = currentTargetIndicator.transform.GetChild(0).gameObject;
             GameObject areaChildTarget = areaParentTarget.transform.GetChild(0).gameObject;
             AreaTarget areaTarget = areaChildTarget.GetComponent<AreaTarget>();
@@ -142,10 +151,13 @@ public class SkillCommand : MonoBehaviour {
     public void OnSkillCasted() {
         dragCounter = 0;
         expectedCooldown = skillReference.GetSkillDefaultCoolDown(skillID: skillID);
-        
-        
+
         skillBaseCast.CastSelectedSkill(_skillID: skillID);
-        currentTargetIndicator.SetActive(false);
+        
+        if (currentTargetIndicator != null) {
+            currentTargetIndicator.SetActive(false);
+        }
+
         targetManager.HideAllTargetIndicators();
         playerStatsController.DeductMP(_mpAmount: skillReference.GetSetMPConsumption(skillID: skillID));
 

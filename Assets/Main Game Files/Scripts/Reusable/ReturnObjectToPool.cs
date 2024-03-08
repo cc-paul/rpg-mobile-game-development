@@ -19,11 +19,6 @@ public class ReturnObjectToPool : MonoBehaviour {
 
     public IEnumerator ReturnToPool(GameObject spawnedObject,TagLookAtCamera tagLookAtCamera = null) {
         yield return new WaitForSeconds(useClipTransitionDuration ? AnimationLength() : duration);
-
-        if (tagLookAtCamera != null) {
-            tagLookAtCamera.RemoveFromNameTag(uiInfoToRemove: spawnedObject.transform);
-        }
-
         spawnedObject.SetActive(false);
     }
 

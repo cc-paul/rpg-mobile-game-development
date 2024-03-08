@@ -27,7 +27,6 @@ public class DamageTextController : MonoBehaviour {
             GameObject damageTextHolder = Instantiate(damageTextHolderPrefab, damageTextHolderPrefab.transform.position, Quaternion.identity, transform);
             damageTextPool.Enqueue(damageTextHolder);
 
-            tagLookAtCamera.AddOnLookAtCamera(uiInfo: damageTextHolder.transform,uiIsHP: false);
             damageTextHolder.SetActive(false);
         }
     }

@@ -19602,6 +19602,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Glow Orb
       objectReference: {fileID: 0}
+    - target: {fileID: 3080870023758947243, guid: c15ec24cdc4bc1d48bd075874ee1612d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3956946615086123830, guid: c15ec24cdc4bc1d48bd075874ee1612d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 226.52902

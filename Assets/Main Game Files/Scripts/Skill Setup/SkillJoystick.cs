@@ -147,12 +147,23 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
             return;
         }
         if (skillBaseCast.GetSetIsCastingSkill) return;
+
+        if (skillReference.GetSkillForAlly(skillID: skillCommand.GetSetSkillID) && skillReference.GetSkillMaxTarget(skillID: skillCommand.GetSetSkillID) == 1) {
+            ResetTargets();
+            targetManager.AddToFinalTargetList(target: skillCommand.GetSetController);
+            skillCommand.OnSkillCasted();
+            return;
+        }
         
         skillSetup.SetPrimarySkillButton(gameObject.name.ToString());
 
         if (gameObject.name.ToString() == skillSetup.GetSetButtonSkillName) {
-            skillReference.GetSetCancelSkill = false;
-            targetManager.ClearTargetList(includeFinal: true);
+            ResetTargets();
+
+            if (skillReference.GetSkillForAlly(skillID: skillCommand.GetSetSkillID) && skillReference.GetSkillMaxTarget(skillID: skillCommand.GetSetSkillID) > 1) {
+                targetManager.AddTargets(target: skillCommand.GetSetController,addToParent: true);
+            }
+
             skillCommand.OnBeforeCast();
             OnDrag(eventData);
         }
@@ -219,6 +230,11 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
 
             skillCommand.ResetTargetting();
         }
+    }
+
+    private void ResetTargets() {
+        skillReference.GetSetCancelSkill = false;
+        targetManager.ClearTargetList(includeFinal: true);
     }
 
     private void ResetSkillJoyStick() {

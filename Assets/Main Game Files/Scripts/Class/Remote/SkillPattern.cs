@@ -6,7 +6,7 @@ public class SkillDetail {
     public int id;
     public string displayName;
     public int defaultCooldown;
-    public int baseDamage;
+    public float baseDamage;
     public string indicatorType;
     public int maxTarget;
     public float areaRange;
@@ -16,9 +16,11 @@ public class SkillDetail {
     public float deactivationTime;
     public float mpConsumption;
     public float addedSpeed;
+    public float deductedSpeed;
     public float distanceToCast;
     public string icon;
     public bool requiresWeapon;
+    public float addedDamage;
 }
 
 [Serializable]

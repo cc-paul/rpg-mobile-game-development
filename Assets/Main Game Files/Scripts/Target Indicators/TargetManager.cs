@@ -18,6 +18,8 @@ public class TargetManager : MonoBehaviour {
     private List<GameObject> childTargetList = new List<GameObject>();
     private List<GameObject> shownArrowList = new List<GameObject>();
     private GameObject nearestTarget;
+    private GameObject attackTarget;
+    private GameObject assistTarget;
     private Vector3 nearestTargetPosition;
     private SkillReference skillReference;
 
@@ -49,6 +51,11 @@ public class TargetManager : MonoBehaviour {
     public Vector3 GetSetPlayerPosition {
         get { return controller.transform.position; }
         set { controller.transform.position = value; }
+    }
+
+    public List<GameObject> GetSetFinalTargetList {
+        get { return finalTargetList; }
+        set { finalTargetList = value; }
     }
     #endregion 
 
@@ -145,7 +152,28 @@ public class TargetManager : MonoBehaviour {
 
     public void ShowHideTargetIndicators(GameObject target, bool showIt) {
         if (target != null) {
-            Transform targetIndicator = target.transform.Find(Global.TARGET_INDICATOR);
+            Transform targetIndicator = null;
+
+            if (target.tag.ToString() == Global.MOB) {
+               targetIndicator = target.transform.Find(Global.TARGET_INDICATOR);
+            } else if (
+               target.tag.ToString() == Global.PLAYER_OTHERS ||
+               target.tag.ToString() == Global.PLAYER
+            ) {
+                /*
+                    Consider the ff when accepting target
+                    1. Party
+                    2. Duel
+                */
+
+                targetIndicator = target.transform.Find(Global.TARGET_NOTIFY);
+                attackTarget = targetIndicator.Find(Global.TARGET_ATTACK).gameObject;
+                assistTarget = targetIndicator.Find(Global.TARGET_HELP).gameObject;
+
+
+                attackTarget.SetActive(false);
+                assistTarget.SetActive(true);
+            }
 
             if (targetIndicator != null) {
                 targetIndicator.gameObject.SetActive(showIt);
@@ -164,6 +192,12 @@ public class TargetManager : MonoBehaviour {
     public void HideTargetContainer() {
         lineRangeContainer.SetActive(false);
         areaTargetContainer.SetActive(false);
+    }
+
+    public void AddToFinalTargetList(GameObject target) {
+        if (!finalTargetList.Contains(target)) {
+            finalTargetList.Add(target);
+        }
     }
 
     public void HideAllTargetIndicators() {
@@ -190,16 +224,17 @@ public class TargetManager : MonoBehaviour {
             Vector3 directionToTarget = currentTargetPosition - myCurrentPosition;
             float dSqrToTarget = directionToTarget.sqrMagnitude;
 
-            if (dSqrToTarget < nearestTargetDistance) {
-                nearestTargetDistance = dSqrToTarget;
-                nearestTarget = currentTarget;
-                nearestTargetPosition = currentTargetPosition;
+            if (!ReferenceEquals(controller,currentTarget)) {
+                if (dSqrToTarget < nearestTargetDistance) {
+                    nearestTargetDistance = dSqrToTarget;
+                    nearestTarget = currentTarget;
+                    nearestTargetPosition = currentTargetPosition;
+                }
             }
         }
     }
 
     public void LookAtNearestTarget() {
-        //if (finalTargetIndicator.CancelSkill) return;
         if (nearestTarget == null || forAlly) return;
 
         Vector3 directionToTarget = (nearestTarget.transform.position - controller.transform.position).normalized;
