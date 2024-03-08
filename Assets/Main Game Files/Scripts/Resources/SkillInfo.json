@@ -27,9 +27,11 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 0,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 4,
 								"icon" : "",
-								"requiresWeapon" : false					
+								"requiresWeapon" : false,
+								"addedDamage" : 0					
 							},
 							{
 								"id" : 1,
@@ -45,9 +47,11 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 30,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_ice_crack",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 2,
@@ -63,9 +67,11 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 10,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_ground_impact",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 3,
@@ -81,9 +87,11 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 10,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_lightning_ball",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 4,
@@ -99,9 +107,11 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 10,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_lightning_strike",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 5,
@@ -117,9 +127,11 @@
 								"deactivationTime" : 20,
 								"mpConsumption" : 10,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_health_up",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 6,
@@ -135,9 +147,11 @@
 								"deactivationTime" : 15,
 								"mpConsumption" : 10,
 								"addedSpeed" : 2,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_speed_up",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 7,
@@ -153,9 +167,11 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 10,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_ice_down_wave",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
 							},
 							{
 								"id" : 8,
@@ -171,9 +187,31 @@
 								"deactivationTime" : 0,
 								"mpConsumption" : 10,
 								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
 								"distanceToCast" : 0,
 								"icon" : "icon_whirlwind",
-								"requiresWeapon" : true	
+								"requiresWeapon" : true,
+								"addedDamage" : 0				
+							},
+							{
+								"id" : 9,
+								"displayName" : "Berserkers Aura",
+								"defaultCooldown" : 20,
+								"baseDamage" : 0,
+								"indicatorType" : "Area",
+								"maxTarget" : 1,
+								"areaRange" : 0,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : true,
+								"deactivationTime" : 30,
+								"mpConsumption" : 80,
+								"addedSpeed" : 0,
+								"deductedSpeed" : 0.3,
+								"distanceToCast" : 0,
+								"icon" : "icon_berserk",
+								"requiresWeapon" : true,
+								"addedDamage" : 300				
 							}
 						]
 					}

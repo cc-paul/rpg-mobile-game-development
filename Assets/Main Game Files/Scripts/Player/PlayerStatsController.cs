@@ -13,6 +13,7 @@ public class PlayerStatsController : MonoBehaviour {
     private StatModifier damageStat;
     private StatModifier healthStat;
     private StatModifier mpStat;
+    private SkillBaseCast skillBaseCast;
 
     #region GetSet Properties
     public Component GetSetSourceComponent {
@@ -24,6 +25,7 @@ public class PlayerStatsController : MonoBehaviour {
     private void Awake() {
         playerStatsManager = GetComponent<PlayerStatsManager>();
         modelInfoDisplay = GetComponent<ModelInfoDisplay>();
+        skillBaseCast = transform.parent.Find(Global.SKILL_SETTINGS).GetComponent<SkillBaseCast>();
     }
 
     private void Start() {
@@ -34,6 +36,7 @@ public class PlayerStatsController : MonoBehaviour {
     private void ReceiveDamage(float _damageAmount) {
         damageStat = new StatModifier(-_damageAmount, Global.StatModType.Flat, this);
         playerStatsManager.Health.AddModifier(damageStat);
+        skillBaseCast.DisplayDamage(damageTextPosition:skillBaseCast.GetSetTargetManager.GetSetPlayerPosition,damage:_damageAmount);
         UpdateHealthUI();
 
         /*
@@ -44,6 +47,10 @@ public class PlayerStatsController : MonoBehaviour {
         if (playerStatsManager.Health.Value <= 0) {
             if (playerStatsManager.GetSetHPCoroutine != null) {
                 StopCoroutine(playerStatsManager.GetSetHPCoroutine);
+            }
+
+            if (playerStatsManager.GetSetMPCoroutine != null) {
+                StopCoroutine(playerStatsManager.GetSetMPCoroutine);
             }
 
             if (sourceComponent as TestHealAndDamage) {

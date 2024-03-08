@@ -12,19 +12,22 @@ public class EnemyAI : MonoBehaviour {
 
     [Header("Enemy Animations")]
     [SerializeField] private List<AnimationClipInfo<Global.EnemyAnimation>> enemyAnimation = new List<AnimationClipInfo<Global.EnemyAnimation>>();
-
-    private AnimancerComponent animancerComponent;
+    
     [Space(2)]
+
+    [Header("AI Settings")]
     [SerializeField] private List<GameObject> patrolPoints = new List<GameObject>();
 
 
+    private AnimancerComponent animancerComponent;
     private NavMeshAgent mobsAgent;
     private EnemyStatsManager enemyStatsManager;
     private GameObject enemyPlayer;
+    private List<int> navigationIndices = new List<int>();
     private Vector3 currentDestination;
+    private Vector3 directionToTarget;
     private Coroutine patrolCoroutine;
     private float enemyAIUpdateInterval = 1f;
-    private int navigationIndex;
 
     #region GetSet Properties
     public GameObject GetSetEnemyPlayer {
@@ -44,19 +47,28 @@ public class EnemyAI : MonoBehaviour {
     public void SetNavigationDefaultStats() {
         mobsAgent.speed = enemyStatsManager.Speed.Value;
         mobsAgent.isStopped = false;
-        navigationIndex = 0;
     }
 
     public void CreatePatrollingPoints() {
         //TODO: The patrol points is only from a game object it must be random vector3 from a spawn area
-
-        if (navigationIndex == patrolPoints.Count - 1) {
-            navigationIndex = 0;
-        } else {
-            navigationIndex++;
+        if (navigationIndices.Count == patrolPoints.Count) {
+            navigationIndices.Clear();
         }
 
-        currentDestination = patrolPoints[navigationIndex].transform.position;
+        int index;
+        do {
+            index = Random.Range(0, patrolPoints.Count);
+        } while (navigationIndices.Contains(index));
+
+        navigationIndices.Add(index);
+        currentDestination = patrolPoints[index].transform.position;
+        directionToTarget = (currentDestination - transform.parent.transform.position).normalized;
+        mobsAgent.isStopped = false;
+
+        if (directionToTarget.sqrMagnitude > 0.0001f) {
+            Quaternion yOnlyRotation = Quaternion.LookRotation(new Vector3(directionToTarget.x, 0, directionToTarget.z));
+            transform.parent.transform.rotation = yOnlyRotation;
+        }
     }
 
     public void InitializePatrol() {
@@ -83,8 +95,14 @@ public class EnemyAI : MonoBehaviour {
 
             
             if (mobsAgent.remainingDistance <= mobsAgent.stoppingDistance) {
+                PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
+                mobsAgent.isStopped = true;
+                mobsAgent.ResetPath();
+
+                yield return new WaitForSeconds(3f);
                 CreatePatrollingPoints();
-                mobsAgent.SetDestination(currentDestination);
+                InitializePatrol();
+                break;
             }
         }
     }

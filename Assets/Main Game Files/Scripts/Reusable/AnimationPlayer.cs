@@ -87,10 +87,12 @@ public class AnimationPlayer : MonoBehaviour {
             yield return null;
         }
 
-        castingProgress.gameObject.SetActive(false);
+        HideCastProgress();
     }
 
     public void HideCastProgress() {
-        castingProgress.gameObject.SetActive(false);
+        if (castingProgress.activeSelf) {
+            castingProgress.gameObject.SetActive(false);
+        }
     }
 }

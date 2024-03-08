@@ -84,7 +84,7 @@ public class SkillReference : MonoBehaviour {
         return GetSkillProperty(skillID, skillDetail => skillDetail.defaultCooldown);
     }
 
-    public int GetSkillDamage(int skillID) {
+    public float GetSkillDamage(int skillID) {
         return GetSkillProperty(skillID, skillDetail => skillDetail.baseDamage);
     }
 
@@ -104,12 +104,20 @@ public class SkillReference : MonoBehaviour {
         return GetSkillProperty(skillID, skillDetail => skillDetail.addedSpeed);
     }
 
+    public float GetDeductedSpeed(int skillID) {
+        return GetSkillProperty(skillID, skillDetail => skillDetail.deductedSpeed);
+    }
+
     public bool GetSkillForAlly(int skillID) {
         return GetSkillProperty(skillID, skillDetail => skillDetail.forAlly);
     }
 
     public float GetSetDeactivationTime(int skillID) {
         return GetSkillProperty(skillID, skillDetail => skillDetail.deactivationTime);
+    }
+
+    public float GetAddedDamage(int skillID) {
+        return GetSkillProperty(skillID, skillDetail => skillDetail.addedDamage);
     }
 
     public float GetSetMPConsumption(int skillID) {

@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/*
+    TODO: 
+    1. Character Stats must be API generated
+ */
+
+
 public class PlayerStatsManager : MonoBehaviour {
     [Header("Reusable Variable")]
     [SerializeField] private bool useInspectorStats;
@@ -113,6 +120,7 @@ public class PlayerStatsManager : MonoBehaviour {
         playerStatsController = GetComponent<PlayerStatsController>();
 
         if (useInspectorStats) {
+            //TODO: Uncheck this or if ever can remove because this is API based
             AddDefaultStats();
         }
     }
@@ -133,7 +141,7 @@ public class PlayerStatsManager : MonoBehaviour {
     }
 
     public IEnumerator RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
-        while (stat.Value < maxStat.Value && stat.Value > 0) {
+        while (stat.Value < maxStat.Value) {
             StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
             stat.AddModifier(regenModifier);
 

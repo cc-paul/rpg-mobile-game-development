@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Mob
+  - SpellFX
+  - Play Others
+  - Player Others
   layers:
   - Default
   - TransparentFX
@@ -20,7 +23,7 @@ TagManager:
   - Target Indicators
   - Mobs
   - Damage Tag
-  - 
+  - Player Others
   - 
   - 
   - 

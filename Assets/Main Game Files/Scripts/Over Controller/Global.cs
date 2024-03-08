@@ -63,7 +63,8 @@ public class Global {
         Speed_Up,
         Ice_Down_Wave,
         Whirlwind,
-        Lightning_Orb
+        Lightning_Orb,
+        Berserk_Aura
     }
 
     public enum GameTags {
@@ -86,7 +87,8 @@ public class Global {
         icon_health_up,
         icon_speed_up,
         icon_ice_down_wave,
-        icon_whirlwind
+        icon_whirlwind,
+        icon_berserk
     }
 
     /* Target Indicator */
@@ -113,6 +115,7 @@ public class Global {
 
     /* Game Object */
     public const string GENERAL_SETTINGS = "General Settings";
+    public const string SKILL_SETTINGS = "Skill Settings";
     public const string BUTTON_SKILL_NAME = "Button Skill Slot #";
     public const string BACKGROUND = "Background";
     public const string HANDLE = "Handle";
@@ -131,9 +134,13 @@ public class Global {
     public const string BASIC_INFO_UI_V2 = "Basic Info UI V2";
     public const string MOBS_INFO_UI = "Mobs Info UI";
     public const string TARGET_INDICATOR = "Target Indicator";
+    public const string TARGET_NOTIFY = "Target Notify";
     public const string CONTROLLER = "Controller";
     public const string DUMMY = "Dummy Only";
     public const string NUMBER_CONTAINER = "Number Container";
+    public const string TARGET_ATTACK = "Target Attack";
+    public const string TARGET_HELP = "Target Help";
+    public const string BUFF_EFFECT_POOL = "Buff Effect Pool";
 
     /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";
