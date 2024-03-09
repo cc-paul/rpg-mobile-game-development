@@ -11,10 +11,15 @@ public class SkillBaseCast : MonoBehaviour {
     [SerializeField] private GameObject swordsmanSkills;
     [SerializeField] private GameObject objectPoolManagerGO;
     [SerializeField] private GameObject damageUIManager;
+    [SerializeField] private GameObject skillDurationWindow;
 
     [Header("UI Damage")]
     [SerializeField] private GameObject damageTextPrefab;
-    
+
+
+    [Header("UI Cooldown Window Item")]
+    [SerializeField] private GameObject skillCooldownItemPrefab;
+
     [Space(2)]
 
     [Header("Variable Declarations and other assignment")]
@@ -31,6 +36,7 @@ public class SkillBaseCast : MonoBehaviour {
     private ObjectPoolManager objectPoolManager;
     private ObjectPoolManager damageTextObjectPoolManager;
     private PlayerStatsController playerStatsController;
+    private PlayerStatsManager playerStatsManager;
     private TagLookAtCamera tagLookAtCamera;
     private SkillReference skillReference;
     private ObjectPoolManager buffEffectPool;
@@ -89,6 +95,11 @@ public class SkillBaseCast : MonoBehaviour {
         set { playerStatsController = value; }
     }
 
+    public PlayerStatsManager GetSetPlayerStatsManager {
+        get { return playerStatsManager; }
+        set { playerStatsManager = value; }
+    }
+
     public bool GetSetDidCastSkill {
         get { return didCastSkill; }
         set { didCastSkill = value; }
@@ -103,10 +114,21 @@ public class SkillBaseCast : MonoBehaviour {
         get { return isCastingSkill; }
         set { isCastingSkill = value; }
     }
+
+    public GameObject GetSetSkillWindowCooldownGO {
+        get { return skillCooldownItemPrefab; }
+        set { skillCooldownItemPrefab = value; }
+    }
+
+    public GameObject GetSetSkillDurationWindow {
+        get { return skillDurationWindow; }
+        set { skillDurationWindow = value; }
+    }
     #endregion
 
     private void Awake() {
         /* Base Components */
+        playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
         animationPlayer = generalSettings.GetComponent<AnimationPlayer>();
         weaponWeilding = generalSettings.GetComponent<WeaponWeilding>();
         basicAnimation = generalSettings.GetComponent<BasicAnimation>();

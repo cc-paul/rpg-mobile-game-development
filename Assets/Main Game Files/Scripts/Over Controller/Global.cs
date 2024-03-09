@@ -101,7 +101,12 @@ public class Global {
         Enemy_Idle,
         Enemy_Attack,
         Enemy_Run,
-        Enemy_Walk
+        Enemy_Walk,
+        Enemy_Death,
+        Attack1_Animation,
+        Attack2_Animation,
+        Attack3_Animation,
+        Enemy_Chase
     }
 
     /* Tags */
@@ -145,6 +150,7 @@ public class Global {
     /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";
     public const string PREFS_SKILLNO_ = "Prefs_Skill_No_";
+    public const string DURATION_ITEM = "Duration_Item";
 
     /* Message */
     public const string MESSAGE_NO_MANA = "Unable to cast skill, no mana";

@@ -272,7 +272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isRange: 0
   defaultSpeed: 1
-  defaultHealth: 1000
+  defaultHealth: 2000
   baseRegenHP: 0.5
   baseDamage: 100
   Speed:
@@ -330,6 +330,16 @@ MonoBehaviour:
         _Callbacks: []
         _Names: []
       _Clip: {fileID: 7400000, guid: 2e96ee13a529c284c942805bfc2717f3, type: 2}
+      _Speed: 1
+      _NormalizedStartTime: NaN
+  - animationName: 4
+    clipTransition:
+      _FadeDuration: 0.25
+      _Events:
+        _NormalizedTimes: []
+        _Callbacks: []
+        _Names: []
+      _Clip: {fileID: 7400000, guid: 0f323d127880aa74d8bd24a60e4fa0aa, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
   patrolPoints:
@@ -1572,10 +1582,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 1565758983780601210}
   - {fileID: 7250905007338569350}
   - {fileID: 3404578379504451670}
   - {fileID: 675972393796104400}
-  - {fileID: 1565758983780601210}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1736751015287024484
@@ -1650,7 +1660,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5289478309129940290}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 1
   m_Speed: 3.5
   m_Acceleration: 100
   avoidancePriority: 50

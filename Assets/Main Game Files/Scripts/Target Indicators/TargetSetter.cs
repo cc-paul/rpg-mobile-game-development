@@ -1,15 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TargetSetter : MonoBehaviour {
+    [Header("UI")]
+    [SerializeField] private Sprite allyIndicator;
+    [SerializeField] private Sprite enemyIndacor;
+    [SerializeField] private Sprite lineIndicator;
+
+
     [Header("Game Object and Others")]
     [SerializeField] private GameObject skillSettings;
-    [SerializeField] private GameObject controller;
 
     [Space(10)]
 
     [Header("Variable Declarations and Other Assignment")]
     [SerializeField] private bool isParentTargetSetter;
+    [SerializeField] private bool isLine;
 
     private SkillReference skillReference;
     private TargetManager targetManager;
@@ -21,6 +28,12 @@ public class TargetSetter : MonoBehaviour {
 
     private void OnTriggerEnter(Collider target) {
         SetTargetIndicator(target: target.gameObject, addIt: true);
+    }
+
+    private void OnEnable() {
+        bool forAlly = skillReference.GetSkillForAlly(skillID: skillReference.GetSetFinalSkillID);
+
+        gameObject.GetComponent<Image>().sprite = isLine ? lineIndicator : forAlly ? allyIndicator : enemyIndacor;
     }
 
     private void OnTriggerStay(Collider target) {

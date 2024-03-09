@@ -7,6 +7,7 @@ public class BerserkAura : MonoBehaviour {
     [SerializeField] private GameObject berserkAuraPrefab;
 
     private SkillBaseCast skillBaseCast;
+    private float duration;
 
     private void Awake() {
         skillBaseCast = transform.parent.GetComponent<SkillBaseCast>();
@@ -32,7 +33,7 @@ public class BerserkAura : MonoBehaviour {
     public void ActivateEffect() {
         float expectedAddedDamage = skillBaseCast.GetSetSkillReference.GetAddedDamage(skillID: skillBaseCast.GetSetSkillID);
         float expectedDeductedSpeed = skillBaseCast.GetSetSkillReference.GetDeductedSpeed(skillID: skillBaseCast.GetSetSkillID);
-        float duration = skillBaseCast.GetSetSkillReference.GetSetDeactivationTime(skillID: skillBaseCast.GetSetSkillID);
+        duration = skillBaseCast.GetSetSkillReference.GetSetDeactivationTime(skillID: skillBaseCast.GetSetSkillID);
         GameObject berserkAura;
         GameObject buffEffectPool;
         BerserkAura_AI berserkAura_AI;
@@ -52,6 +53,23 @@ public class BerserkAura : MonoBehaviour {
             berserkAura.SetActive(false);
             berserkAura.SetActive(true);
         }
+    }
+
+    public void DisplayDurationInMainUI() {
+        string skillObjectNameToCall = $"{skillBaseCast.GetSetPlayerStatsManager.GetSetCharacterType}_{skillBaseCast.GetSetSkillID}_{Global.DURATION_ITEM}";
+        GameObject skillDurationItem = skillBaseCast.GetSetSkillDurationWindow.transform.Find(skillObjectNameToCall).gameObject;
+        SkillWindowDurationSetter skillWindowDurationSetter = skillDurationItem.GetComponent<SkillWindowDurationSetter>();
+
+        skillWindowDurationSetter.GetSetSkillID = skillBaseCast.GetSetSkillID;
+        skillWindowDurationSetter.GetSetDuration = duration;
+        skillWindowDurationSetter.GetSetSkillSprite = skillBaseCast.GetSetSkillReference.GetSkillSprite(
+            iconName: skillBaseCast.GetSetSkillReference.GetIconName(
+                skillID: skillBaseCast.GetSetSkillID
+            )
+        );
+
+        skillDurationItem.SetActive(false);
+        skillDurationItem.SetActive(true);
     }
 
     public void ReturnToCombatMode() {
