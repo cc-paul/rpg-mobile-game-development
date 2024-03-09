@@ -7,6 +7,7 @@ public class HealthUp : MonoBehaviour {
     [SerializeField] private GameObject healthUpPrefab;
 
     private SkillBaseCast skillBaseCast;
+    float duration;
 
     private void Awake() {
         skillBaseCast = transform.parent.GetComponent<SkillBaseCast>();
@@ -31,7 +32,7 @@ public class HealthUp : MonoBehaviour {
 
     public void ActivateEffect() {
         float expectedMaxHealth = skillBaseCast.GetSetSkillReference.GetSkillAddedHP(skillID: skillBaseCast.GetSetSkillID);
-        float duration = skillBaseCast.GetSetSkillReference.GetSetDeactivationTime(skillID: skillBaseCast.GetSetSkillID);
+        duration = skillBaseCast.GetSetSkillReference.GetSetDeactivationTime(skillID: skillBaseCast.GetSetSkillID);
         GameObject healthUpAura;
         GameObject buffEffectPool;
         HealthUp_AI healthUp_AI;
@@ -53,6 +54,23 @@ public class HealthUp : MonoBehaviour {
             healthUpAura.SetActive(false);
             healthUpAura.SetActive(true);
         }
+    }
+
+    public void DisplayDurationInMainUI() {
+        string skillObjectNameToCall = $"{skillBaseCast.GetSetPlayerStatsManager.GetSetCharacterType}_{skillBaseCast.GetSetSkillID}_{Global.DURATION_ITEM}";
+        GameObject skillDurationItem = skillBaseCast.GetSetSkillDurationWindow.transform.Find(skillObjectNameToCall).gameObject;
+        SkillWindowDurationSetter skillWindowDurationSetter = skillDurationItem.GetComponent<SkillWindowDurationSetter>();
+
+        skillWindowDurationSetter.GetSetSkillID = skillBaseCast.GetSetSkillID;
+        skillWindowDurationSetter.GetSetDuration = duration;
+        skillWindowDurationSetter.GetSetSkillSprite = skillBaseCast.GetSetSkillReference.GetSkillSprite(
+            iconName: skillBaseCast.GetSetSkillReference.GetIconName(
+                skillID: skillBaseCast.GetSetSkillID
+            )
+        );
+
+        skillDurationItem.SetActive(false);
+        skillDurationItem.SetActive(true);
     }
 
     public void ReturnToCombatMode() {

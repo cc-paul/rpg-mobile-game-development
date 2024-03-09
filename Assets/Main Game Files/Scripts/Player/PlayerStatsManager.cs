@@ -53,6 +53,7 @@ public class PlayerStatsManager : MonoBehaviour {
     private Coroutine regenMPCourotine;
     private Coroutine regenHPCourotine;
     private bool isPlayerDead;
+    private List<GameObject> currentMobsFollowingMe = new List<GameObject>();
 
     #region Character GetSet Properties
     public Global.Characters GetSetCharacterType {
@@ -114,6 +115,11 @@ public class PlayerStatsManager : MonoBehaviour {
         get { return isPlayerDead; }
         set { isPlayerDead = value; }
     }
+
+    public List<GameObject> GetSetCurrentMobsFollowingMe {
+        get { return currentMobsFollowingMe; }
+        set { currentMobsFollowingMe = value; }
+    }
     #endregion
 
     private void Awake() {
@@ -122,7 +128,11 @@ public class PlayerStatsManager : MonoBehaviour {
         if (useInspectorStats) {
             //TODO: Uncheck this or if ever can remove because this is API based
             AddDefaultStats();
-        }
+        }  
+    }
+
+    private void OnEnable() {
+        currentMobsFollowingMe.Clear();
     }
 
     private void AddDefaultStats() {

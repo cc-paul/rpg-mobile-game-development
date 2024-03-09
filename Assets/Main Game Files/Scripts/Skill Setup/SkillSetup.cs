@@ -17,6 +17,8 @@ public class SkillSetup : MonoBehaviour {
     [SerializeField] private GameObject generalSettings;
     [SerializeField] private GameObject tempSkillIconParent;
     [SerializeField] private GameObject skillQuickSlotParent;
+    [SerializeField] private GameObject skillDurationWindow;
+    [SerializeField] private GameObject skillCooldownIndicatorPrefab;
 
     [Space(2)]
 
@@ -65,6 +67,11 @@ public class SkillSetup : MonoBehaviour {
     }
 
     private void SetSkillBaseReference() {
+        List<SkillType> skillTypeListForIconBuff = new List<SkillType>();
+        List<SkillDetail> skillDetailForIconBuff = new List<SkillDetail>();
+        GameObject skillCooldownIndicator;
+        string skillObjectName;
+
         //TODO : This section gets the skill list from an API that will be basis of the skill settings used by the player
         skillReference.GetSetPlayerSkillList = FileHandler.ReadFromJSONString<BaseResponse<BaseResponseData<SkillPattern>>>(testSkillAPIJSON.text);
 
@@ -75,6 +82,20 @@ public class SkillSetup : MonoBehaviour {
                 foreach (SkillPattern current in skillPatternData.records) {
                     if (current.character == playerStatsManager.GetSetCharacterType.ToString()) {
                         skillReference.GetSetSkillTypeList = current.skillDetails;
+                    }
+
+                    skillTypeListForIconBuff = current.skillDetails;
+
+                    foreach (SkillType currentSkillSet in skillTypeListForIconBuff) {
+                        skillDetailForIconBuff = currentSkillSet.details;
+                        
+                        foreach (SkillDetail currentSkillDetail in skillDetailForIconBuff) {
+                            if (currentSkillDetail.isBuff) {
+                                skillObjectName = $"{current.character}_{currentSkillDetail.id}_{Global.DURATION_ITEM}";
+                                skillCooldownIndicator = Instantiate(skillCooldownIndicatorPrefab, skillDurationWindow.transform);
+                                skillCooldownIndicator.name = skillObjectName;
+                            }
+                        }
                     }
                 }
             } else {

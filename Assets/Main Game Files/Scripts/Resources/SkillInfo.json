@@ -5,7 +5,7 @@
         "Skills has been retreived"
     ],
     "data": {
-        "rows_returned": 6,
+        "rows_returned": 1,
         "records": [
         	{
 				"character" : "Swordsman",
@@ -31,7 +31,8 @@
 								"distanceToCast" : 4,
 								"icon" : "",
 								"requiresWeapon" : false,
-								"addedDamage" : 0					
+								"addedDamage" : 0,
+								"isBuff" : false					
 							},
 							{
 								"id" : 1,
@@ -51,7 +52,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_ice_crack",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : false						
 							},
 							{
 								"id" : 2,
@@ -71,7 +73,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_ground_impact",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : false						
 							},
 							{
 								"id" : 3,
@@ -91,7 +94,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_lightning_ball",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : false						
 							},
 							{
 								"id" : 4,
@@ -111,7 +115,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_lightning_strike",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : false						
 							},
 							{
 								"id" : 5,
@@ -131,7 +136,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_health_up",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : true						
 							},
 							{
 								"id" : 6,
@@ -151,7 +157,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_speed_up",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : true						
 							},
 							{
 								"id" : 7,
@@ -171,12 +178,13 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_ice_down_wave",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : false						
 							},
 							{
 								"id" : 8,
 								"displayName" : "Whirlwind",
-								"defaultCooldown" : 10,
+								"defaultCooldown" : 1,
 								"baseDamage" : 300,
 								"indicatorType" : "Area",
 								"maxTarget" : 8,
@@ -191,7 +199,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_whirlwind",
 								"requiresWeapon" : true,
-								"addedDamage" : 0				
+								"addedDamage" : 0,
+								"isBuff" : false						
 							},
 							{
 								"id" : 9,
@@ -211,7 +220,8 @@
 								"distanceToCast" : 0,
 								"icon" : "icon_berserk",
 								"requiresWeapon" : true,
-								"addedDamage" : 300				
+								"addedDamage" : 300,
+								"isBuff" : true						
 							}
 						]
 					}

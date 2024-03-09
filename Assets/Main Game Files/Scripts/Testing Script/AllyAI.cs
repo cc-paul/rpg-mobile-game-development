@@ -73,10 +73,8 @@ public class AllyAI : MonoBehaviour {
         directionToTarget = (currentDestination - controller.transform.position).normalized;
         allyAgent.isStopped = false;
 
-        if (directionToTarget.sqrMagnitude > 0.0001f) {
-            Quaternion yOnlyRotation = Quaternion.LookRotation(new Vector3(directionToTarget.x, 0, directionToTarget.z));
-            controller.transform.rotation = yOnlyRotation;
-        }
+        var lookDirection = new Vector3(currentDestination.x, controller.transform.position.y, currentDestination.z);
+        controller.transform.LookAt(lookDirection);
     }
 
     private void InitializePatrol() {

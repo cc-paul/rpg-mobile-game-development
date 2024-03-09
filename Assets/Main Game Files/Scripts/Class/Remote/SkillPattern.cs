@@ -21,6 +21,7 @@ public class SkillDetail {
     public string icon;
     public bool requiresWeapon;
     public float addedDamage;
+    public bool isBuff;
 }
 
 [Serializable]

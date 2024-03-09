@@ -17,35 +17,59 @@ public class EnemyAI : MonoBehaviour {
 
     [Header("AI Settings")]
     [SerializeField] private List<GameObject> patrolPoints = new List<GameObject>();
+    [SerializeField] private float distanceToAttackMelee = 3f;
+    [SerializeField] private float distanceToAttackRange = 6f;
+    [SerializeField] private bool isEnemyRange;
 
-
+    private BoxCollider enemyCollider;
+    private EnemyUIController enemyUIController;
     private AnimancerComponent animancerComponent;
     private NavMeshAgent mobsAgent;
-    private EnemyStatsManager enemyStatsManager;
-    private GameObject enemyPlayer;
+    private EnemyStatsManager mobsStatsManager;
     private List<int> navigationIndices = new List<int>();
     private Vector3 currentDestination;
     private Vector3 directionToTarget;
     private Coroutine patrolCoroutine;
     private float enemyAIUpdateInterval = 1f;
+    private float additionalSpeed;
+    private float attackRange;
+    private float attackDuration;
+
+    //For player who hit the mobs
+    private GameObject enemyPlayerController;
+    private GameObject enemyPlayerHitter;
+    private GameObject enemyPlayerToAttack;
+
+    private GameObject enemyParentObject;
+    private PlayerStatsManager enemyPlayerHitterStatsManager;
+
+    private StatModifier damageTaken;
+    private StatModifier addedChaseSpeed;
 
     #region GetSet Properties
-    public GameObject GetSetEnemyPlayer {
-        get { return enemyPlayer; }
-        set { enemyPlayer = value; }
-    }
+    /*    public GameObject GetSetEnemyPlayer {
+            get { return enemyPlayer; }
+            set { enemyPlayer = value; }
+        }*/
     #endregion
 
     private void Awake() {
         OptionalWarning.NativeControllerHumanoid.Disable();
 
-        mobsAgent = transform.parent.GetComponent<NavMeshAgent>();
+        enemyParentObject = transform.parent.gameObject;
+
+        enemyUIController = GetComponent<EnemyUIController>();
+        mobsAgent = enemyParentObject.GetComponent<NavMeshAgent>();
         animancerComponent = enemyModel.GetComponent<AnimancerComponent>();
-        enemyStatsManager = GetComponent<EnemyStatsManager>();
+        mobsStatsManager = GetComponent<EnemyStatsManager>();
+        enemyCollider = enemyParentObject.GetComponent<BoxCollider>();
     }
 
     public void SetNavigationDefaultStats() {
-        mobsAgent.speed = enemyStatsManager.Speed.Value;
+        attackRange = isEnemyRange ? distanceToAttackRange : distanceToAttackMelee;
+        mobsAgent.stoppingDistance = attackRange;
+        mobsAgent.radius = attackRange;
+        mobsAgent.speed = mobsStatsManager.Speed.Value;
         mobsAgent.isStopped = false;
     }
 
@@ -61,14 +85,15 @@ public class EnemyAI : MonoBehaviour {
         } while (navigationIndices.Contains(index));
 
         navigationIndices.Add(index);
-        currentDestination = patrolPoints[index].transform.position;
-        directionToTarget = (currentDestination - transform.parent.transform.position).normalized;
         mobsAgent.isStopped = false;
+        currentDestination = patrolPoints[index].transform.position;
 
-        if (directionToTarget.sqrMagnitude > 0.0001f) {
-            Quaternion yOnlyRotation = Quaternion.LookRotation(new Vector3(directionToTarget.x, 0, directionToTarget.z));
-            transform.parent.transform.rotation = yOnlyRotation;
-        }
+        LookAtTheTarget();
+    }
+
+    private void LookAtTheTarget() {
+        var lookDirection = new Vector3(currentDestination.x, enemyParentObject.transform.position.y, currentDestination.z);
+        enemyParentObject.transform.LookAt(lookDirection);
     }
 
     public void InitializePatrol() {
@@ -88,27 +113,121 @@ public class EnemyAI : MonoBehaviour {
         while (enabled) {
             yield return new WaitForSeconds(enemyAIUpdateInterval);
 
-            if (enemyPlayer != null) {
-                //TODO: Attack the player if it doesnt reach the max lure capacity
+            if (mobsStatsManager.Health.Value <= 0) {
+                
+                if (enemyPlayerToAttack != null) {
+                    GameObject playerManager = enemyPlayerToAttack.transform.parent.gameObject;
+                    GameObject generalSettings = playerManager.transform.Find(Global.GENERAL_SETTINGS).gameObject;
+                    PlayerStatsManager playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
+
+                    if (playerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentObject)) {
+                        playerStatsManager.GetSetCurrentMobsFollowingMe.Remove(enemyParentObject);
+                    }
+
+                    enemyPlayerToAttack = null;
+                }
+
+                PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Death.ToString());
+                enemyCollider.enabled = false;
+                mobsAgent.ResetPath();
+                mobsAgent.isStopped = true;
+
+                yield return new WaitForSeconds(3f);
+                enemyParentObject.SetActive(false);
                 break;
             }
 
-            
-            if (mobsAgent.remainingDistance <= mobsAgent.stoppingDistance) {
-                PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
-                mobsAgent.isStopped = true;
-                mobsAgent.ResetPath();
+            if (enemyPlayerToAttack != null) {
+                GameObject playerManager = enemyPlayerToAttack.transform.parent.gameObject;
+                GameObject generalSettings = playerManager.transform.Find(Global.GENERAL_SETTINGS).gameObject;
+                PlayerStatsManager playerStatsManager = generalSettings.GetComponent<PlayerStatsManager>();
 
-                yield return new WaitForSeconds(3f);
-                CreatePatrollingPoints();
-                InitializePatrol();
-                break;
+                if (playerStatsManager.Health.Value <= 0) {
+                    PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
+                    yield return new WaitForSeconds(1f);
+
+                    enemyPlayerToAttack = null;
+                    addedChaseSpeed = new StatModifier(-additionalSpeed, Global.StatModType.Flat, this);
+                    mobsStatsManager.Speed.AddModifier(addedChaseSpeed);
+                    mobsAgent.speed = mobsStatsManager.Speed.Value;
+
+                    if (playerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentObject)) {
+                        playerStatsManager.GetSetCurrentMobsFollowingMe.Remove(enemyParentObject);
+                    }
+
+                    mobsAgent.ResetPath();
+                    CreatePatrollingPoints();
+                    InitializePatrol();
+                    break;
+                }
+
+                mobsAgent.speed = mobsStatsManager.Speed.Value;
+                currentDestination = enemyPlayerToAttack.transform.position;
+                mobsAgent.SetDestination(currentDestination);
+                LookAtTheTarget();
+
+                if (mobsAgent.remainingDistance <= attackRange) {
+                    int attackNumber = Random.Range(1,4);
+                    string attackName = $"Attack{attackNumber}_Animation";
+                    PlayEnemyAnimation(_currentAnimationName: attackName);
+                    mobsAgent.isStopped = true;
+                    yield return new WaitForSeconds(attackDuration);
+                    mobsAgent.isStopped = false;
+                } else {
+                    PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Chase.ToString());
+                }
+            } else {
+                if (mobsAgent.remainingDistance <= mobsAgent.stoppingDistance) {
+                    PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
+                    mobsAgent.isStopped = true;
+                    mobsAgent.ResetPath();
+
+                    yield return new WaitForSeconds(3f);
+                    CreatePatrollingPoints();
+                    InitializePatrol();
+                    break;
+                }
             }
         }
     }
 
     public void TakeDamage(PlayerStatsController playerStatsController,float damage) {
+        damageTaken = new StatModifier(-damage, Global.StatModType.Flat, this);
+        mobsStatsManager.Health.AddModifier(damageTaken);
 
+        enemyUIController.UpdateHealthUI(
+            _currentHP: mobsStatsManager.Health.Value,
+            _maxHP: mobsStatsManager.MaxHealth.Value
+        );
+
+        StartCoroutine(mobsStatsManager.RegenStatCoroutine(
+            mobsStatsManager.Health,
+            mobsStatsManager.MaxHealth,
+            mobsStatsManager.HealthRegenValue
+        ));
+
+        if (enemyPlayerHitter != null) return;
+
+        enemyPlayerController = playerStatsController.transform.parent.gameObject.transform.Find(Global.CONTROLLER).gameObject;
+        enemyPlayerHitter = playerStatsController.gameObject;
+        enemyPlayerHitterStatsManager = enemyPlayerHitter.GetComponent<PlayerStatsManager>();
+
+        int currentEnemyFollowingCount = enemyPlayerHitterStatsManager.GetSetCurrentMobsFollowingMe.Count;
+        int maxTargetToLure = enemyPlayerHitterStatsManager.GetSetMaxTargetToLure;
+
+        if (currentEnemyFollowingCount < maxTargetToLure) {
+            if (!enemyPlayerHitterStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentObject)) {
+                enemyPlayerHitterStatsManager.GetSetCurrentMobsFollowingMe.Add(enemyParentObject);
+                enemyPlayerToAttack = enemyPlayerController;
+
+                additionalSpeed = 1;
+                addedChaseSpeed = new StatModifier(additionalSpeed, Global.StatModType.Flat,this);
+                mobsStatsManager.Speed.AddModifier(addedChaseSpeed);
+
+
+                mobsAgent.ResetPath();
+            }
+        }
     }
 
     public void PlayEnemyAnimation(string _currentAnimationName) {
@@ -119,6 +238,7 @@ public class EnemyAI : MonoBehaviour {
         );
 
         if (animationClipInfo != null) {
+            attackDuration = animationClipInfo.clipTransition.Length;
             currentClipTransition = animationClipInfo.clipTransition;
         }
 

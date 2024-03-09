@@ -7,6 +7,7 @@ public class SpeedUp : MonoBehaviour {
     [SerializeField] private GameObject speedAuraPrefab;
 
     private SkillBaseCast skillBaseCast;
+    float duration;
 
     private void Awake() {
         skillBaseCast = transform.parent.GetComponent<SkillBaseCast>();
@@ -31,7 +32,7 @@ public class SpeedUp : MonoBehaviour {
 
     public void ActivateEffect() {
         float expectedSpeed = skillBaseCast.GetSetSkillReference.GetSkillAddedSpeed(skillID: skillBaseCast.GetSetSkillID);
-        float duration = skillBaseCast.GetSetSkillReference.GetSetDeactivationTime(skillID: skillBaseCast.GetSetSkillID);
+        duration = skillBaseCast.GetSetSkillReference.GetSetDeactivationTime(skillID: skillBaseCast.GetSetSkillID);
         GameObject speedUpAura;
         GameObject buffEffectPool;
         SpeedUp_AI speedUp_AI;
@@ -50,6 +51,23 @@ public class SpeedUp : MonoBehaviour {
             speedUpAura.SetActive(false);
             speedUpAura.SetActive(true);
         }
+    }
+
+    public void DisplayDurationInMainUI() {
+        string skillObjectNameToCall = $"{skillBaseCast.GetSetPlayerStatsManager.GetSetCharacterType}_{skillBaseCast.GetSetSkillID}_{Global.DURATION_ITEM}";
+        GameObject skillDurationItem = skillBaseCast.GetSetSkillDurationWindow.transform.Find(skillObjectNameToCall).gameObject;
+        SkillWindowDurationSetter skillWindowDurationSetter = skillDurationItem.GetComponent<SkillWindowDurationSetter>();
+
+        skillWindowDurationSetter.GetSetSkillID = skillBaseCast.GetSetSkillID;
+        skillWindowDurationSetter.GetSetDuration = duration;
+        skillWindowDurationSetter.GetSetSkillSprite = skillBaseCast.GetSetSkillReference.GetSkillSprite(
+            iconName: skillBaseCast.GetSetSkillReference.GetIconName(
+                skillID: skillBaseCast.GetSetSkillID
+            )
+        );
+
+        skillDurationItem.SetActive(false);
+        skillDurationItem.SetActive(true);
     }
 
     public void ReturnToCombatMode() {
