@@ -42,16 +42,7 @@ public class EnemyStatsManager : MonoBehaviour {
         enemyAI = GetComponent<EnemyAI>();
     }
 
-    private void Start() {
-        AddDefaultStats();
-        enemyUIController.UpdateHealthUI(_currentHP: Health.Value,_maxHP: MaxHealth.Value);
-        enemyAI.PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
-        enemyAI.SetNavigationDefaultStats();
-        enemyAI.CreatePatrollingPoints();
-        enemyAI.InitializePatrol();
-    }
-
-    private void AddDefaultStats() {
+    public void AddDefaultStats() {
         Speed.BaseValue = defaultSpeed;
         Health.BaseValue = defaultHealth;
         MaxHealth.BaseValue = Health.Value;

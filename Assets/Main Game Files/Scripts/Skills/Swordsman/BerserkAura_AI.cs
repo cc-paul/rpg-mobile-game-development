@@ -15,6 +15,8 @@ public class BerserkAura_AI : MonoBehaviour {
     private StatModifier addedDamageValue;
     private StatModifier deductedSpeedValue;
 
+    private WaitForSeconds skillNullDuration = new WaitForSeconds(0f);
+
     #region GetSet Properties 
     public float GetSetAddedDamage {
         get { return addedDamage; }
@@ -71,7 +73,7 @@ public class BerserkAura_AI : MonoBehaviour {
 
             //TODO: Add code to remove the buffs if the player has been dead
 
-            yield return null;
+            yield return skillNullDuration;
         }
 
         gameObject.SetActive(false);

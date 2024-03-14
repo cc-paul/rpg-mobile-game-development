@@ -55,8 +55,10 @@ public class IceDownWave : MonoBehaviour {
 
     public void ShowIcecle() {
         GameObject icecle ;
+        GameObject currentTarget;
 
-        foreach (GameObject currentTarget in skillBaseCast.GetSetTargetManager.GetTargetList()) {
+        for (int i = 0; i < skillBaseCast.GetSetTargetManager.GetTargetList().Count; i++) {
+            currentTarget = skillBaseCast.GetSetTargetManager.GetTargetList()[i];
             icecle = skillBaseCast.GetSetObjectPoolManager.SpawnFromPool(iceclePrfab.name.ToString());
             icecle.transform.position = currentTarget.transform.position;
             icecle.SetActive(true);
@@ -69,16 +71,23 @@ public class IceDownWave : MonoBehaviour {
                                skillBaseCast.GetSetSkillReference.GetSkillDamage(skillBaseCast.GetSetSkillID);
         bool isDamageApplied = false;
 
-        /* For Mobs */
-        GameObject controller;
+        /* Mobs Preferences */
+        GameObject enemyController;
+        GameObject currentTarget = null;
         EnemyAI enemyAI;
 
-        foreach (GameObject currentTarget in skillBaseCast.GetSetTargetManager.GetTargetList()) {
+        for (int i = 0; i < skillBaseCast.GetSetTargetManager.GetTargetList().Count; i++) {
+            currentTarget = skillBaseCast.GetSetTargetManager.GetTargetList()[i];
+
             if (currentTarget.transform.Find(Global.CONTROLLER) != null) {
-                /* Current Target is Mob */
-                controller = currentTarget.transform.Find(Global.CONTROLLER).gameObject;
-                enemyAI = controller.GetComponent<EnemyAI>();
-                enemyAI.TakeDamage(playerStatsController: skillBaseCast.GetSetPlayerStatsController, damage: expectedDamage);
+                /* If mobs is target */
+                /*enemyController = currentTarget.transform.Find(Global.CONTROLLER).gameObject;
+                enemyAI = enemyController.GetComponent<EnemyAI>();
+                enemyAI.EnemyTakeDamage(
+                    playerStatsManager: skillBaseCast.GetSetPlayerStatsManager,
+                    playerStatsController: skillBaseCast.GetSetPlayerStatsController,
+                    damage: expectedDamage
+                );*/
                 isDamageApplied = true;
             } else if (currentTarget.transform.Find(Global.DUMMY) != null) {
                 isDamageApplied = true;

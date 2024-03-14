@@ -109,6 +109,12 @@ public class Global {
         Enemy_Chase
     }
 
+    /* Regen Category */
+    public enum RegenCategory {
+        HPRegen,
+        MPRegen
+    }
+
     /* Tags */
     public const string PLAYER = "Player";
     public const string PLAYER_OTHERS = "Player Others";

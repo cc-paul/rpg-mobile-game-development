@@ -11,6 +11,8 @@ public class MessageBoxManager : MonoBehaviour {
     [SerializeField] private Button btnClose;
 
     private Coroutine hideMessageDelay;
+    private float expectedCooldown = 1.5f;
+    private float timer = 0f;
 
     private void Awake() {
         btnClose.onClick.AddListener(() => {
@@ -20,14 +22,10 @@ public class MessageBoxManager : MonoBehaviour {
 
     public void ShowMessage(string currentMessage) {
         message.SetText(currentMessage);
-
-        if (hideMessageDelay != null) {
-            StopCoroutine(hideMessageDelay);
-        }
-
-        hideMessageDelay = StartCoroutine(nameof(HideMessageDelay));
+        timer = 0f;
 
         if (!messageBox.activeSelf) {
+            StartCoroutine(nameof(HideMessageDelay));
             messageBox.SetActive(true);
         }
     }
@@ -37,7 +35,11 @@ public class MessageBoxManager : MonoBehaviour {
     }
 
     private IEnumerator HideMessageDelay() {
-        yield return new WaitForSeconds(1.5f);
+        while (timer < expectedCooldown) {
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
         btnClose.onClick.Invoke();
     }
 }

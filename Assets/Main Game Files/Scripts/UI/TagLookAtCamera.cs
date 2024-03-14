@@ -100,20 +100,22 @@ public class TagLookAtCamera : MonoBehaviour {
     private void LateUpdate() {
         if (nameTagInfoList.Count == 0) return;
 
-        foreach (NameTagInfo nameTagInfo in nameTagInfoList) {
-            nameTagInfo.uiTag.LookAt(
-                nameTagInfo.uiTag.position + camera.transform.rotation * vectorForward,
-                camera.transform.rotation * vectorUp
-            );
+        for (int i = 0; i < nameTagInfoList.Count; i++) {
+            if (nameTagInfoList[i].uiTag.gameObject.activeSelf) {
+                nameTagInfoList[i].uiTag.LookAt(
+                    nameTagInfoList[i].uiTag.position + camera.transform.rotation * vectorForward,
+                    camera.transform.rotation * vectorUp
+                );
 
-            distance = Vector3.Distance(nameTagInfo.uiTag.position, camera.transform.position);
-            scaleFactor = distance / 10f;
-            scaleFactor = Mathf.Clamp(scaleFactor, 0.1f, 1.5f);
-            scaleFactorHP = distance / 15f;
-            scaleFactorHP = Mathf.Clamp(scaleFactorHP, 0.08f, 0.1f);
-            finalScale = nameTagInfo.isHP ? scaleFactorHP : scaleFactor;
+                distance = Vector3.Distance(nameTagInfoList[i].uiTag.position, camera.transform.position);
+                scaleFactor = distance / 10f;
+                scaleFactor = Mathf.Clamp(scaleFactor, 0.1f, 1.5f);
+                scaleFactorHP = distance / 15f;
+                scaleFactorHP = Mathf.Clamp(scaleFactorHP, 0.08f, 0.1f);
+                finalScale = nameTagInfoList[i].isHP ? scaleFactorHP : scaleFactor;
 
-            nameTagInfo.uiTag.localScale = vectorOne * finalScale;
+                nameTagInfoList[i].uiTag.localScale = vectorOne * finalScale;
+            }
         }
     }
 }

@@ -60,6 +60,7 @@ public class CameraControl : MonoBehaviour {
     private Touch touchOne;
     private Vector2 touchZeroPrevPos;
     private Vector2 touchOnePrevPos;
+    private Transform cameraTransform;
 
     #region CameraControl GetSet Properties
     public bool GetSetIsPressed {
@@ -74,6 +75,7 @@ public class CameraControl : MonoBehaviour {
     #endregion
 
     private void Awake() {
+        cameraTransform = transform;
         UpdateTarget(target);
 
 
@@ -84,8 +86,8 @@ public class CameraControl : MonoBehaviour {
 
     public void UpdateTarget(Transform _target) {
         target = _target;
-        transform.position = target.position - transform.forward * distanceFromTarget;
-        transform.localEulerAngles = new Vector3(currentX, -currentY, 0);
+        cameraTransform.position = target.position - transform.forward * distanceFromTarget;
+        cameraTransform.localEulerAngles = new Vector3(currentX, -currentY, 0);
     }
 
     private void LateUpdate() {
@@ -100,8 +102,8 @@ public class CameraControl : MonoBehaviour {
         rotation = Quaternion.Euler(currentY, currentX, 0);
         position = rotation * new Vector3(0f, 0f, -distanceFromTarget - currentFOV) + target.position + offset;
 
-        transform.rotation = rotation;
-        transform.position = position;
+        cameraTransform.rotation = rotation;
+        cameraTransform.position = position;
     }
 
     private void HandleTouch() {

@@ -9,6 +9,8 @@ public class SkillCommand : MonoBehaviour {
     [SerializeField] private Image timerImageCooldown;
     [SerializeField] private Sprite defaultBackground;
 
+    [Space(2)]
+
     [Header("Game Objects and otherts")]
     [SerializeField] private GameObject controller;
     [SerializeField] private GameObject gameManager;
@@ -18,9 +20,12 @@ public class SkillCommand : MonoBehaviour {
     [SerializeField] private GameObject lineTargetIndicator;
     [SerializeField] private GameObject areaTargetIndicator;
 
+    [Space(2)]
+
     [Header("Variable Declarations and other assignment")]
     [SerializeField] private bool isNormalAttack;
 
+    private WaitForSeconds skillCastNullWait = new WaitForSeconds(0f);
     private GameObject currentTargetIndicator;
     private MessageBoxManager messageBoxManager;
     private SkillBaseCast skillBaseCast;
@@ -194,23 +199,24 @@ public class SkillCommand : MonoBehaviour {
     }
 
     public void InitializeCooldown() {
-        if (cooldownCoroutine != null) {
-            StopCoroutine(cooldownCoroutine);
-        }
-
         timer = 0f;
         isCoolingDown = true;
         timerImageCooldown.gameObject.SetActive(true);
-        cooldownCoroutine = StartCoroutine(nameof(StartCoolDown));
+
+
+        if (cooldownCoroutine == null) {
+            cooldownCoroutine = StartCoroutine(nameof(StartCoolDown));
+        }
     }
 
     private IEnumerator StartCoolDown() {
         while (timer < expectedCooldown) {
             timerImageCooldown.fillAmount = 1 - (timer / expectedCooldown);
             timer += Time.deltaTime;
-            yield return null;
+            yield return skillCastNullWait;
         }
 
+        cooldownCoroutine = null;
         isCoolingDown = false;
         timerImageCooldown.gameObject.SetActive(false);
     }
