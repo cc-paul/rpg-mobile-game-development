@@ -24,6 +24,8 @@ public class LightningOrb_AI : MonoBehaviour {
     }
     #endregion
 
+    private WaitForSeconds skillNullDuration = new WaitForSeconds(0f);
+    private WaitForSeconds skillDestoyAfterHit = new WaitForSeconds(2f);
 
     public void IntializeLightningOrb() {
         if (moveTowardsTargetCoroutine != null) {
@@ -44,13 +46,13 @@ public class LightningOrb_AI : MonoBehaviour {
                 break;
             }
 
-            yield return null;
+            yield return skillNullDuration;
         }
 
         energyBallPrefab.SetActive(false);
         explosionPrefab.SetActive(true);
         lightningOrb.ApplyDamage(currentTarget: targetEnemy);
-        yield return new WaitForSeconds(2f);
+        yield return skillDestoyAfterHit;
         DestroyBall();
     }
 

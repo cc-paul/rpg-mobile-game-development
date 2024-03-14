@@ -101,8 +101,8 @@ public class AllyAI : MonoBehaviour {
 
                 yield return new WaitForSeconds(3f);
                 CreatePatrollingPoints();
-                InitializePatrol();
-                break;
+            } else {
+                allyAgent.SetDestination(currentDestination);
             }
         }
     }

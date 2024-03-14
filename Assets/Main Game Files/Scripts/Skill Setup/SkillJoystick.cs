@@ -215,6 +215,7 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
             skillSetup.GetSetButtonSkillName = "";
 
             if (!targetManager.IsThereAnEnemy() && !skillReference.GetSetCancelSkill) {
+                targetManager.HideAllTargetIndicators();
                 skillCommand.GetSetMessageBoxManager.ShowMessage(currentMessage: Global.MESSAGE_NO_TARGET);
             };
 
@@ -234,6 +235,7 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
 
     private void ResetTargets() {
         skillReference.GetSetCancelSkill = false;
+        targetManager.HideAllTargetIndicators();
         targetManager.ClearTargetList(includeFinal: true);
     }
 

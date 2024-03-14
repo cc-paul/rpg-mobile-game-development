@@ -12,6 +12,8 @@ public class SpeedUp_AI : MonoBehaviour {
     /* Stat Modifier */
     private StatModifier speed;
 
+    private WaitForSeconds skillNullDuration = new WaitForSeconds(0f);
+
     #region GetSet Properties 
     public float GetSetSpeedValue {
         get { return speedValue; }
@@ -54,7 +56,7 @@ public class SpeedUp_AI : MonoBehaviour {
 
             //TODO: Add code to remove the buffs if the player has been dead
 
-            yield return null;
+            yield return skillNullDuration;
         }
 
         gameObject.SetActive(false);

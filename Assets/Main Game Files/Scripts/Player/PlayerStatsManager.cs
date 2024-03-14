@@ -150,14 +150,26 @@ public class PlayerStatsManager : MonoBehaviour {
         BaseDamage.BaseValue = baseDamage;
     }
 
-    public IEnumerator RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
+    public IEnumerator RegenStatCoroutine(
+        CharacterStat stat,
+        CharacterStat maxStat,
+        CharacterStat regenValue,
+        string regenCategory
+    ) {
         while (stat.Value < maxStat.Value) {
             StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
             stat.AddModifier(regenModifier);
 
             playerStatsController.UpdateHealthUI();
+            //TODO: Stop also the regen if the player is dead
 
             if (stat.Value >= maxStat.Value) {
+                if (regenCategory == Global.RegenCategory.HPRegen.ToString()) {
+                    regenHPCourotine = null;
+                } else if (regenCategory == Global.RegenCategory.MPRegen.ToString()) {
+                    regenMPCourotine = null;
+                }
+
                 RecalibrateStat(stat,maxStat);
                 break;
             }

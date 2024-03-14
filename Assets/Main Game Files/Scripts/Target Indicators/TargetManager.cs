@@ -184,6 +184,7 @@ public class TargetManager : MonoBehaviour {
                     }
                 } else {
                     shownArrowList.Remove(targetIndicator.gameObject);
+                    targetIndicator.gameObject.SetActive(false);
                 }
             }
         }

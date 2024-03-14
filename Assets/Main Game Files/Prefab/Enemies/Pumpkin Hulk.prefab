@@ -236,6 +236,7 @@ GameObject:
   - component: {fileID: 6940039499027965660}
   - component: {fileID: 5353496529427124692}
   - component: {fileID: 2437293933311395851}
+  - component: {fileID: 5379863478567633568}
   m_Layer: 12
   m_Name: Controller
   m_TagString: Untagged
@@ -322,30 +323,21 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: d16fb7916be601248a684a9338fcc209, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 3
-    clipTransition:
-      _FadeDuration: 0.25
-      _Events:
-        _NormalizedTimes: []
-        _Callbacks: []
-        _Names: []
-      _Clip: {fileID: 7400000, guid: 2e96ee13a529c284c942805bfc2717f3, type: 2}
-      _Speed: 1
-      _NormalizedStartTime: NaN
-  - animationName: 4
-    clipTransition:
-      _FadeDuration: 0.25
-      _Events:
-        _NormalizedTimes: []
-        _Callbacks: []
-        _Names: []
-      _Clip: {fileID: 7400000, guid: 0f323d127880aa74d8bd24a60e4fa0aa, type: 2}
-      _Speed: 1
-      _NormalizedStartTime: NaN
-  patrolPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+--- !u!114 &5379863478567633568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602670478641058665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa07edfd52dbb84191a5b7286fd3f5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nameTagInfoList:
+  - uiTag: {fileID: 2655116412189948958}
+    isHP: 0
 --- !u!1 &1101504066928886999
 GameObject:
   m_ObjectHideFlags: 0
@@ -1472,7 +1464,7 @@ SkinnedMeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   serializedVersion: 2
-  m_Quality: 0
+  m_Quality: 2
   m_UpdateWhenOffscreen: 0
   m_SkinnedMotionVectors: 0
   m_Mesh: {fileID: 7725599599912899254, guid: e3df32639cb5e2945853b0554e4fc724, type: 3}
@@ -1660,14 +1652,14 @@ NavMeshAgent:
   m_GameObject: {fileID: 5289478309129940290}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1
+  m_Radius: 1.2
   m_Speed: 3.5
   m_Acceleration: 100
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 2.5
+  m_StoppingDistance: 1.2
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 2
   m_BaseOffset: 0

@@ -36,9 +36,9 @@ public class TargetSetter : MonoBehaviour {
         gameObject.GetComponent<Image>().sprite = isLine ? lineIndicator : forAlly ? allyIndicator : enemyIndacor;
     }
 
-    private void OnTriggerStay(Collider target) {
+/*    private void OnTriggerStay(Collider target) {
         SetTargetIndicator(target: target.gameObject, addIt: true);
-    }
+    }*/
 
     private void OnTriggerExit(Collider target) {
         SetTargetIndicator(target: target.gameObject, addIt: false);

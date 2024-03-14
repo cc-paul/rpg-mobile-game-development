@@ -28,10 +28,13 @@ public class MovementController : MonoBehaviour {
     private TargetPositioning skillTargetPositioning;
     private SkillBaseCast skillBaseCast;
 
+    private WaitForSeconds movementNullWait = new WaitForSeconds(0f);
     private Vector2 input;
     private Vector2 inputDir;
     private Vector3 velocity;
+    private Vector3 adjustedVelocity;
     private Vector3 down = Vector3.down;
+    private Vector3 up = Vector3.up;
     private Transform cameraTransform;
     private Ray ray;
     private RaycastHit hitInfo;
@@ -45,6 +48,8 @@ public class MovementController : MonoBehaviour {
     private float targetRotation;
     private float targetSpeed;
     private bool isRunning;
+    private Transform controllerTransform;
+    private Quaternion slopeRotation;
 
     private StatModifier basicAddedSpeed;
 
@@ -62,6 +67,7 @@ public class MovementController : MonoBehaviour {
         playerStatsManager = GetComponent<PlayerStatsManager>();
         skillBaseCast = skillSettings.GetComponent<SkillBaseCast>();
         cameraTransform = Camera.main.transform;
+        controllerTransform = controller.transform;
     }
 
     private void Start() {
@@ -85,11 +91,9 @@ public class MovementController : MonoBehaviour {
     }
 
     public void InitiatePlayerMovement() {
-        if (playerMovementCourotine != null) {
-            StopCoroutine(nameof(PlayerStartMoving));
+        if (playerMovementCourotine == null) {
+            playerMovementCourotine = StartCoroutine(nameof(PlayerStartMoving));
         }
-
-        playerMovementCourotine  = StartCoroutine(nameof(PlayerStartMoving));
     }
 
     private IEnumerator PlayerStartMoving() {
@@ -105,12 +109,14 @@ public class MovementController : MonoBehaviour {
                 skillBaseCast.GetSetIsCastingSkill && !skillBaseCast.GetSetEnableCancelingSkill) ||
                 playerStatsManager.GetSetIsPlayerDead
             ) {
+                playerMovementCourotine = null;
                 break;
             }
 
             if (inputDir == Vector2.zero) {
                 basicAnimation.PlayBasicAnimation(_animationCategory: Global.AnimationCategory.Idle);
                 skillTargetPositioning.RepositionTargetIndicator();
+                playerMovementCourotine = null;
                 break;
             }
 
@@ -118,8 +124,8 @@ public class MovementController : MonoBehaviour {
 
             targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraTransform.eulerAngles.y;
 
-            controller.transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(
-                controller.transform.eulerAngles.y,
+            controllerTransform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(
+                controllerTransform.eulerAngles.y,
                 targetRotation, ref turnSmoothVelocity,
                 turnSmoothTime
             );
@@ -132,7 +138,7 @@ public class MovementController : MonoBehaviour {
                 speedSmoothTime
             );
 
-            velocity = controller.transform.forward * currentSpeed;
+            velocity = controllerTransform.forward * currentSpeed;
             velocity = AdjustVelocityToSlope(_velocity: velocity);
             velocity.y += ySpeed + 1f;
 
@@ -142,18 +148,18 @@ public class MovementController : MonoBehaviour {
             skillTargetPositioning.RepositionTargetIndicator();
             
 
-            yield return null;
+            yield return movementNullWait;
         }
     }
 
     private Vector3 AdjustVelocityToSlope(Vector3 _velocity) {
-        ray = new Ray(controller.transform.position, down);
+        ray = new Ray(controllerTransform.position, down);
 
         Debug.DrawRay(ray.origin, hitInfo.normal, Color.green);
 
         if (Physics.Raycast(ray, out hitInfo, 0.05f)) {
-            var slopeRotation = Quaternion.FromToRotation(Vector3.up, hitInfo.normal);
-            var adjustedVelocity = slopeRotation * _velocity;
+            slopeRotation = Quaternion.FromToRotation(up, hitInfo.normal);
+            adjustedVelocity = slopeRotation * _velocity;
 
             if (adjustedVelocity.y < 0) {
                 return adjustedVelocity;

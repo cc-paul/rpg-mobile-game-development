@@ -14,18 +14,8 @@ public class NameTagAdder : MonoBehaviour {
         tagLookAtCamera = FindAnyObjectByType<TagLookAtCamera>();
     }
 
-    private void Start() {
-        LoopAndAddToCamera();
-    }
-
     private void OnEnable() {
         LoopAndAddToCamera();
-    }
-
-    private void OnDisable() {
-        foreach (NameTagInfo nameTagInfo in nameTagInfoList) {
-            RemoveFromNameTag(uiInfoToRemove: nameTagInfo.uiTag);
-        }
     }
 
     private void LoopAndAddToCamera() {
@@ -46,7 +36,7 @@ public class NameTagAdder : MonoBehaviour {
     public void RemoveFromNameTag(Transform uiInfoToRemove) {
         for (int i = 0; i < tagLookAtCamera.GetSetNameTagInfoList.Count; i++) {
             if (tagLookAtCamera.GetSetNameTagInfoList[i].uiTag == uiInfoToRemove) {
-                tagLookAtCamera.GetSetNameTagInfoList.RemoveAt(i);
+                tagLookAtCamera.GetSetNameTagInfoList[i].uiTag.gameObject.SetActive(false);
                 return;
             }
         }

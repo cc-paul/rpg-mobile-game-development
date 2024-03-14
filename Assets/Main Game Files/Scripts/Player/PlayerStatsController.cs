@@ -92,31 +92,27 @@ public class PlayerStatsController : MonoBehaviour {
     }
 
     public void RegenHP() {
-        if (playerStatsManager.GetSetHPCoroutine != null) {
-            StopCoroutine(playerStatsManager.GetSetHPCoroutine);
-        }
-
-        playerStatsManager.GetSetHPCoroutine = StartCoroutine(
-            playerStatsManager.RegenStatCoroutine(
+        if (playerStatsManager.GetSetHPCoroutine == null) {
+            playerStatsManager.GetSetHPCoroutine = playerStatsManager.GetSetHPCoroutine = 
+            StartCoroutine(playerStatsManager.RegenStatCoroutine(
                 playerStatsManager.Health,
                 playerStatsManager.MaxHealth,
-                playerStatsManager.HealthRegenValue
-            )
-        );
+                playerStatsManager.HealthRegenValue,
+                Global.RegenCategory.HPRegen.ToString()
+            ));
+        }
     }
 
     public void RegenMP() {
-        if (playerStatsManager.GetSetMPCoroutine != null) {
-            StopCoroutine(playerStatsManager.GetSetMPCoroutine);
-        }
-
-        playerStatsManager.GetSetMPCoroutine = StartCoroutine(
-            playerStatsManager.RegenStatCoroutine(
+        if (playerStatsManager.GetSetMPCoroutine == null) {
+            playerStatsManager.GetSetMPCoroutine =
+            StartCoroutine(playerStatsManager.RegenStatCoroutine(
                 playerStatsManager.MP,
                 playerStatsManager.MaxMP,
-                playerStatsManager.MPRegenValue
-            )
-        );
+                playerStatsManager.MPRegenValue,
+                Global.RegenCategory.MPRegen.ToString()
+            ));
+        }
     }
 
     public float GetTotalBaseDamage() {

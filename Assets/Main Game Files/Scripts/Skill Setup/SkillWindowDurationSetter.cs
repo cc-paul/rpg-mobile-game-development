@@ -15,6 +15,8 @@ public class SkillWindowDurationSetter : MonoBehaviour {
     private float timer;
     private int skillID = 0;
 
+    private WaitForSeconds skillNullDuration = new WaitForSeconds(0f);
+
     #region GetSet Propeties
     public Sprite GetSetSkillSprite {
         get { return skillSprite; }
@@ -59,7 +61,7 @@ public class SkillWindowDurationSetter : MonoBehaviour {
 
             //TODO: Add code to remove the buffs if the player has been dead
 
-            yield return null;
+            yield return skillNullDuration;
         }
 
         gameObject.SetActive(false);

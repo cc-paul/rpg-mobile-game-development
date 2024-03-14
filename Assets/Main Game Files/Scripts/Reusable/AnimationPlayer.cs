@@ -24,6 +24,7 @@ public class AnimationPlayer : MonoBehaviour {
     [SerializeField] private GameObject castingProgress;
     [SerializeField] private Image progressBarFill;
 
+    private WaitForSeconds skillCastNullWait = new WaitForSeconds(0f);
     private PlayerStatsManager playerStatsManager;
     private Coroutine castingCoroutine;
     private float expectedCooldown = 0;
@@ -69,29 +70,30 @@ public class AnimationPlayer : MonoBehaviour {
         //TODO: Hide Casting Progress when:
         //1. Moving
         //2. Dead
-
-        if (castingCoroutine != null) {
-            progressBarFill.fillAmount = 0;
-            StopCoroutine(castingCoroutine);
-        }
-
         timer = 0;
         castingProgress.SetActive(true);
-        castingCoroutine = StartCoroutine(nameof(StartCasting));
+
+
+        if (castingCoroutine == null) {
+            progressBarFill.fillAmount = 1;
+            castingCoroutine = StartCoroutine(nameof(StartCasting));
+        }
     }
 
     private IEnumerator StartCasting() {
         while (timer < expectedCooldown) {
             progressBarFill.fillAmount = 1 - (timer / expectedCooldown);
             timer += Time.deltaTime;
-            yield return null;
+            yield return skillCastNullWait;
         }
 
+        castingCoroutine = null;
         HideCastProgress();
     }
 
     public void HideCastProgress() {
         if (castingProgress.activeSelf) {
+            castingCoroutine = null;
             castingProgress.gameObject.SetActive(false);
         }
     }
