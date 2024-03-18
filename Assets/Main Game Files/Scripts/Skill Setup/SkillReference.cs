@@ -46,8 +46,15 @@ public class SkillReference : MonoBehaviour {
     }
 
     public T GetSkillProperty<T>(int skillID, Func<SkillDetail, T> propertySelector) {
-        foreach (SkillType skillType in skillTypeList) {
-            foreach (SkillDetail skillDetail in skillType.details) {
+        SkillType skillType;
+        SkillDetail skillDetail;
+
+        for (int skillType_i = 0; skillType_i < skillTypeList.Count; skillType_i++) {
+            skillType = skillTypeList[skillType_i];
+
+            for (int skillDetail_i = 0; skillDetail_i < skillType.details.Count; skillDetail_i++) {
+                skillDetail = skillType.details[skillDetail_i];
+
                 if (skillDetail.id == skillID) {
                     return propertySelector(skillDetail);
                 }
@@ -138,11 +145,13 @@ public class SkillReference : MonoBehaviour {
 
     public Sprite GetSkillSprite(string iconName) {
         string characterType = playerStatsManager.GetSetCharacterType.ToString();
+        Global.SwordsmanSkillIcon currentIconName;
+        Sprite iconSprite;
 
         if (characterType == Global.Characters.Swordsman.ToString()) {
-            foreach (SkillIconInfo<Global.SwordsmanSkillIcon> skillIconInfo in swordsmanSkillIcon) {
-                Global.SwordsmanSkillIcon currentIconName = skillIconInfo.IconName;
-                Sprite iconSprite = skillIconInfo.IconSprite;
+            for (int icon_i = 0; icon_i < swordsmanSkillIcon.Count; icon_i++) {
+                currentIconName = swordsmanSkillIcon[icon_i].IconName;
+                iconSprite = swordsmanSkillIcon[icon_i].IconSprite;
 
                 if (currentIconName.ToString() == iconName) {
                     return iconSprite;

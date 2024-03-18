@@ -55,6 +55,10 @@ namespace MirzaBeig.LightningVFX
             return (elapsedIntervalTime * 1000.0f) / intervalFrameCount;
         }
 
+        private void Awake() {
+            Application.targetFrameRate = 120;
+        }
+
         void Update()
         {
             intervalFrameCount++;

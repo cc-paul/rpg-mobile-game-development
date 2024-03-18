@@ -53,6 +53,7 @@ public class SkillBaseCast : MonoBehaviour {
     private SpeedUp speedUp;
     private HealthUp healthUp;
     private BerserkAura berserkAura;
+    private SwordsBlessing swordsBlessing;
 
     #region GetSet Properties
     public int GetSetSkillID {
@@ -149,6 +150,7 @@ public class SkillBaseCast : MonoBehaviour {
         speedUp = swordsmanSkills.GetComponent<SpeedUp>();
         healthUp = swordsmanSkills.GetComponent<HealthUp>();
         berserkAura = swordsmanSkills.GetComponent<BerserkAura>();
+        swordsBlessing = swordsmanSkills.GetComponent<SwordsBlessing>();
     }
 
     public void CastSelectedSkill(int _skillID) {
@@ -181,6 +183,9 @@ public class SkillBaseCast : MonoBehaviour {
             break;
             case 9:
                 berserkAura.ActivateSkill();
+            break;
+            case 10:
+                swordsBlessing.ActivateSkill();
             break;
         }
     }

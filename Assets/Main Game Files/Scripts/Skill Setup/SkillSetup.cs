@@ -70,6 +70,9 @@ public class SkillSetup : MonoBehaviour {
         List<SkillType> skillTypeListForIconBuff = new List<SkillType>();
         List<SkillDetail> skillDetailForIconBuff = new List<SkillDetail>();
         GameObject skillCooldownIndicator;
+        SkillPattern skillPattern;
+        SkillType currentSkillSet;
+        SkillDetail currentSkillDetail;
         string skillObjectName;
 
         //TODO : This section gets the skill list from an API that will be basis of the skill settings used by the player
@@ -79,19 +82,22 @@ public class SkillSetup : MonoBehaviour {
             BaseResponseData<SkillPattern> skillPatternData = skillReference.GetSetPlayerSkillList.data;
 
             if (skillPatternData.rows_returned != 0) {
-                foreach (SkillPattern current in skillPatternData.records) {
-                    if (current.character == playerStatsManager.GetSetCharacterType.ToString()) {
-                        skillReference.GetSetSkillTypeList = current.skillDetails;
+                for (int skillPattern_i = 0; skillPattern_i < skillPatternData.records.Count; skillPattern_i++) {
+                    skillPattern = skillPatternData.records[skillPattern_i];
+                    skillTypeListForIconBuff = skillPattern.skillDetails;
+
+                    if (skillPattern.character == playerStatsManager.GetSetCharacterType.ToString()) {
+                        skillReference.GetSetSkillTypeList = skillPattern.skillDetails;
                     }
 
-                    skillTypeListForIconBuff = current.skillDetails;
+                    for (int currentSkillSet_i = 0; currentSkillSet_i < skillTypeListForIconBuff.Count; currentSkillSet_i++) {
+                        skillDetailForIconBuff = skillTypeListForIconBuff[currentSkillSet_i].details;
 
-                    foreach (SkillType currentSkillSet in skillTypeListForIconBuff) {
-                        skillDetailForIconBuff = currentSkillSet.details;
-                        
-                        foreach (SkillDetail currentSkillDetail in skillDetailForIconBuff) {
+                        for (int currentSkillDetail_i = 0; currentSkillDetail_i < skillDetailForIconBuff.Count; currentSkillDetail_i++) {
+                            currentSkillDetail = skillDetailForIconBuff[currentSkillDetail_i];
+
                             if (currentSkillDetail.isBuff) {
-                                skillObjectName = $"{current.character}_{currentSkillDetail.id}_{Global.DURATION_ITEM}";
+                                skillObjectName = $"{skillPattern.character}_{currentSkillDetail.id}_{Global.DURATION_ITEM}";
                                 skillCooldownIndicator = Instantiate(skillCooldownIndicatorPrefab, skillDurationWindow.transform);
                                 skillCooldownIndicator.name = skillObjectName;
                             }
@@ -108,14 +114,24 @@ public class SkillSetup : MonoBehaviour {
 
     private void PopulateSkillList() {
         List<SkillType> currentSkillTypeList = skillReference.GetSkillTypeList();
+        List<SkillDetail> skillDetail;
+        GameObject skillRowDetails;
+        Sprite skillSprite;
+        GameObject content;
+        bool includeInSkillList;
+        int skillID;
         int levelrowIndex = 0;
+        string skillName;
+        
 
-        foreach (SkillType skillType in currentSkillTypeList) {
-            foreach (SkillDetail skillDetail in skillType.details) {
-                bool includeInSkillList = skillDetail.includeInSkillList;
-                int skillID = skillDetail.id;
-                string skillName = skillDetail.displayName;
-                Sprite skillSprite = skillReference.GetSkillSprite(
+        for (int currentSkillTypeList_i = 0; currentSkillTypeList_i < currentSkillTypeList.Count; currentSkillTypeList_i++) {
+            skillDetail = currentSkillTypeList[currentSkillTypeList_i].details;
+
+            for (int skillDetail_i = 0; skillDetail_i < skillDetail.Count; skillDetail_i++) {
+                includeInSkillList = skillDetail[skillDetail_i].includeInSkillList;
+                skillID = skillDetail[skillDetail_i].id;
+                skillName = skillDetail[skillDetail_i].displayName;
+                skillSprite = skillReference.GetSkillSprite(
                     iconName: skillReference.GetIconName(
                         skillID: skillID
                     )
@@ -124,7 +140,7 @@ public class SkillSetup : MonoBehaviour {
                 if (includeInSkillList) {
                     levelrowIndex++;
 
-                    GameObject skillRowDetails = Instantiate(
+                    skillRowDetails = Instantiate(
                         skillSlotPrerab,
                         Vector3.zero,
                         Quaternion.identity,
@@ -136,7 +152,7 @@ public class SkillSetup : MonoBehaviour {
                     skillRowDetails.transform.Find($"{Global.DRAGGABLE_ICON_HOLDER}/{Global.ICON_DRAG}").GetComponent<SkillDragAssignment>().GetSetSkillID = skillID;
                     skillRowDetails.transform.Find($"{Global.DRAGGABLE_ICON_HOLDER}/{Global.ICON_DRAG}").GetComponent<SkillDragAssignment>().GetSetTempSkillIconParent = tempSkillIconParent;
 
-                    GameObject content = skillRowDetails.transform.Find(Global.CONTENT).gameObject;
+                    content = skillRowDetails.transform.Find(Global.CONTENT).gameObject;
                     content.transform.Find(Global.SKILL_NAME_VALUE).GetComponent<TextMeshProUGUI>().text = skillName;
                     content.transform.Find(Global.LEVEL_NAME_VALUE).GetComponent<TextMeshProUGUI>().text = levelrowIndex.ToString();
                 }
@@ -146,12 +162,17 @@ public class SkillSetup : MonoBehaviour {
 
     private void SetupSkillConfiguration() {
         skillConfigurationInfo = FileHandler.ReadListFromJSON<SkillConfigurationInfo>(skillConfigFileName);
+        SkillConfigurationInfo _currentConfig;
+        GameObject quickSlot;
+        Image quickSlotIcon;
+        SkillDropAssignment skillDropAssignment;
 
-        foreach (SkillConfigurationInfo _currentConfig in skillConfigurationInfo) {
-            /* For the skill joystick */
+        for (int skillConfig_i = 0; skillConfig_i < skillConfigurationInfo.Count; skillConfig_i++) {
+            _currentConfig = skillConfigurationInfo[skillConfig_i];
+
             skillCommand = skillButtonParent.transform.
-                Find($"{Global.BUTTON_SKILL_NAME}{_currentConfig.buttonID}").
-                GetComponent<SkillCommand>();
+               Find($"{Global.BUTTON_SKILL_NAME}{_currentConfig.buttonID}").
+               GetComponent<SkillCommand>();
 
             skillCommand.GetSetSkillID = _currentConfig.skillID;
             skillCommand.GetSetPrefCooldownRef = $"{Global.PREFS_SKILLNO_}{_currentConfig.skillID}";
@@ -166,11 +187,11 @@ public class SkillSetup : MonoBehaviour {
 
 
             /* For the quickslot in Skill Window */
-            GameObject quickSlot = skillQuickSlotParent.transform.Find($"{Global.QUICK_SLOT}{_currentConfig.buttonID}").gameObject;
-            Image quickSlotIcon = quickSlot.transform.Find(Global.ICON).gameObject.GetComponent<Image>();
-            SkillDropAssignment skillDropAssignment = quickSlot.GetComponent<SkillDropAssignment>();
+            quickSlot = skillQuickSlotParent.transform.Find($"{Global.QUICK_SLOT}{_currentConfig.buttonID}").gameObject;
+            quickSlotIcon = quickSlot.transform.Find(Global.ICON).gameObject.GetComponent<Image>();
+            skillDropAssignment = quickSlot.GetComponent<SkillDropAssignment>();
 
-            skillDropAssignment.GetSetSkillID = _currentConfig.skillID; 
+            skillDropAssignment.GetSetSkillID = _currentConfig.skillID;
 
             if (_currentConfig.skillID == -1) {
                 skillDropAssignment.ResetQuickSlot();
@@ -187,10 +208,12 @@ public class SkillSetup : MonoBehaviour {
     private void RecalibrateQuickSlot() {
         int rowQuickSlot = 1;
         skillConfigurationInfo.Clear();
+        GameObject quickSlot;
+        SkillDropAssignment currentDroppableItem;
 
-        foreach (Transform currentQuickSlot in skillQuickSlotParent.transform) {
-            GameObject quickSlot = currentQuickSlot.gameObject;
-            SkillDropAssignment currentDroppableItem = quickSlot.GetComponent<SkillDropAssignment>();
+        for (int child_i = 0; child_i < skillQuickSlotParent.transform.childCount; child_i++) {
+            quickSlot = skillQuickSlotParent.transform.GetChild(child_i).gameObject;
+            currentDroppableItem = quickSlot.GetComponent<SkillDropAssignment>();
 
             skillConfigurationInfo.Add(new SkillConfigurationInfo(
                 buttonID: rowQuickSlot,
@@ -205,9 +228,12 @@ public class SkillSetup : MonoBehaviour {
     }
 
     public void RemoveExistingSkillID(int droppedSkillID) {
-        foreach (Transform currentQuickSlot in skillQuickSlotParent.transform) {
-            GameObject quickSlot = currentQuickSlot.gameObject;
-            SkillDropAssignment currentDroppableItem = quickSlot.GetComponent<SkillDropAssignment>();
+        GameObject quickSlot;
+        SkillDropAssignment currentDroppableItem;
+
+        for (int child_i = 0; child_i < skillQuickSlotParent.transform.childCount; child_i++) {
+            quickSlot = skillQuickSlotParent.transform.GetChild(child_i).gameObject;
+            currentDroppableItem = quickSlot.GetComponent<SkillDropAssignment>();
 
             if (currentDroppableItem.GetSetSkillID == droppedSkillID) {
                 currentDroppableItem.ResetQuickSlot();
@@ -216,9 +242,12 @@ public class SkillSetup : MonoBehaviour {
     }
 
     private void ClearQuickSlot() {
-        foreach (Transform currentQuickSlot in skillQuickSlotParent.transform) {
-            GameObject quickSlot = currentQuickSlot.gameObject;
-            SkillDropAssignment currentDroppableItem = quickSlot.GetComponent<SkillDropAssignment>();
+        GameObject quickSlot;
+        SkillDropAssignment currentDroppableItem;
+
+        for (int child_i = 0; child_i < skillQuickSlotParent.transform.childCount; child_i++) {
+            quickSlot = skillQuickSlotParent.transform.GetChild(child_i).gameObject;
+            currentDroppableItem = quickSlot.GetComponent<SkillDropAssignment>();
             currentDroppableItem.ResetQuickSlot();
         }
     }

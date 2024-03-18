@@ -12,16 +12,28 @@ public class ObjectPoolManager : MonoBehaviour {
 
     public List<Pool> pools;
     public Dictionary<string, Queue<GameObject>> poolDictionary;
+    private GameObject obj;
+    private GameObject objectToSpawn;
+    private Transform parent;
+    private Queue<GameObject> objectPool;
+    private Pool pool;
+    private string objName;
+
+    private void Awake() {
+        parent = transform;
+    }
 
     private void Start() {
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
 
-        foreach (Pool pool in pools) {
-            Queue<GameObject> objectPool = new Queue<GameObject>();
-            string objName = "";
+        for (int a = 0; a < pools.Count; a++) {
+            pool = pools[a];
+
+            objectPool = new Queue<GameObject>();
+            objName = "";
 
             for (int i = 0; i < pool.size; i++) {
-                GameObject obj = Instantiate(pool.prefab,transform);
+                obj = Instantiate(pool.prefab, parent);
                 obj.SetActive(false);
                 objectPool.Enqueue(obj);
 
@@ -30,12 +42,12 @@ public class ObjectPoolManager : MonoBehaviour {
                 }
             }
 
-            poolDictionary.Add(objName,objectPool);
+            poolDictionary.Add(objName, objectPool);
         }
     }
 
     public GameObject SpawnFromPool(string tag) {
-        GameObject objectToSpawn = poolDictionary[tag].Dequeue();
+        objectToSpawn = poolDictionary[tag].Dequeue();
         poolDictionary[tag].Enqueue(objectToSpawn);
 
         return objectToSpawn;

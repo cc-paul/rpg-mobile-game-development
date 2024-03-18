@@ -64,7 +64,8 @@ public class Global {
         Ice_Down_Wave,
         Whirlwind,
         Lightning_Orb,
-        Berserk_Aura
+        Berserk_Aura,
+        Swords_Blessing
     }
 
     public enum GameTags {
@@ -88,7 +89,8 @@ public class Global {
         icon_speed_up,
         icon_ice_down_wave,
         icon_whirlwind,
-        icon_berserk
+        icon_berserk,
+        icon_swords_blessing
     }
 
     /* Target Indicator */

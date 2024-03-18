@@ -78,10 +78,8 @@ public class CameraControl : MonoBehaviour {
         cameraTransform = transform;
         UpdateTarget(target);
 
-
-        //TODO: Add Button Zoom In and Out
-        /*zoomInButton.onClick.AddListener(ZoomIn);
-        zoomOutButton.onClick.AddListener(ZoomOut);*/
+        zoomInButton.onClick.AddListener(ZoomIn);
+        zoomOutButton.onClick.AddListener(ZoomOut);
     }
 
     public void UpdateTarget(Transform _target) {

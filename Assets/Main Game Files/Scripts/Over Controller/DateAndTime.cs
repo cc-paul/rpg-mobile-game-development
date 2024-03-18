@@ -20,7 +20,7 @@ using UnityEngine;
 
 public class DateAndTime : MonoBehaviour {
     private DateTime localDateTime;
-    private float updateInterval = 1f;
+    private WaitForSeconds updateInterval = new WaitForSeconds(2f);
 
     private void Awake() {
         localDateTime = DateTime.Now;
@@ -36,7 +36,7 @@ public class DateAndTime : MonoBehaviour {
 
     private IEnumerator UpdateLocalDateTime() {
         while (true) {
-            yield return new WaitForSeconds(updateInterval);
+            yield return updateInterval;
             localDateTime = DateTime.Now;
         }
     }

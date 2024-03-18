@@ -222,6 +222,27 @@
 								"requiresWeapon" : true,
 								"addedDamage" : 300,
 								"isBuff" : true						
+							},
+							{
+								"id" : 10,
+								"displayName" : "Swords Blessing",
+								"defaultCooldown" : 25,
+								"baseDamage" : 1200,
+								"indicatorType" : "Area",
+								"maxTarget" : 8,
+								"areaRange" : 1.2,
+								"includeInSkillList" : true,
+								"addedHP" : 0,
+								"forAlly" : false,
+								"deactivationTime" : 0,
+								"mpConsumption" : 180,
+								"addedSpeed" : 0,
+								"deductedSpeed" : 0,
+								"distanceToCast" : 0,
+								"icon" : "icon_swords_blessing",
+								"requiresWeapon" : true,
+								"addedDamage" : 0,
+								"isBuff" : false						
 							}
 						]
 					}
