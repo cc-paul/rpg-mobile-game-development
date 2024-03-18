@@ -49,11 +49,12 @@ public class PlayerStatsManager : MonoBehaviour {
     public CharacterStat MPRegenValue;
     public CharacterStat BaseDamage;
 
+    private WaitForSeconds regenDelayTimer = new WaitForSeconds(0.2f);
+    private List<GameObject> currentMobsFollowingMe = new List<GameObject>();
     private PlayerStatsController playerStatsController;
     private Coroutine regenMPCourotine;
     private Coroutine regenHPCourotine;
     private bool isPlayerDead;
-    private List<GameObject> currentMobsFollowingMe = new List<GameObject>();
 
     #region Character GetSet Properties
     public Global.Characters GetSetCharacterType {
@@ -174,7 +175,7 @@ public class PlayerStatsManager : MonoBehaviour {
                 break;
             }
 
-            yield return new WaitForSeconds(0.2f);
+            yield return regenDelayTimer;
         }
     }
 

@@ -3,20 +3,142 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using MEC;
 
 public class EnemyAI : MonoBehaviour {
     [Header("Game Object and Others")]
     [SerializeField] private GameObject enemyModel;
 
+    [Space(2)]
+
     [Header("Enemy Animations")]
     [SerializeField] private List<AnimationClipInfo<Global.EnemyAnimation>> enemyAnimation = new List<AnimationClipInfo<Global.EnemyAnimation>>();
 
+    [Space(2)]
+
+    [Header("AI Settings")]
+    [SerializeField] private float distanceToAttackMelee = 3f;
+    [SerializeField] private float distanceToAttackRange = 6f;
+    [SerializeField] private bool isEnemyRange;
+
+    private float attackRange;
     private float attackDuration;
+    private bool isEnemyMoving;
+    private GameObject enemyParentContainer;
+    private Vector3 currentDestination;
+    private Vector3 lookDirection;
+
+    private EnemyStatsManager enemyStatsManager;
+    private EnemyUIController enemyUIController;
+    private NavMeshAgent enemyAgent;
     private AnimancerComponent animancerComponent;
+
+    private StatModifier damageTaken;
+
+    #region GetSet Properties 
+    public Vector3 GetSetCurrentDestination {
+        get { return currentDestination; }
+        set { currentDestination = value; }
+    }
+
+    public bool GetSetIsEnemyMoving {
+        get { return isEnemyMoving; }
+        set { isEnemyMoving = value; }
+    }
+
+    public NavMeshAgent GetSetEnemyAgent {
+        get { return enemyAgent; }
+        set { enemyAgent = value; }
+    }
+
+    public GameObject GetSetEnemyParentContainer {
+        get { return enemyParentContainer; }
+        set { enemyParentContainer = value; }
+    }
+    #endregion
 
     private void Awake() {
         OptionalWarning.NativeControllerHumanoid.Disable();
+        enemyParentContainer = transform.parent.gameObject;
+
+        enemyUIController = GetComponent<EnemyUIController>();
+        enemyStatsManager = GetComponent<EnemyStatsManager>();
+        enemyAgent = enemyParentContainer.GetComponent<NavMeshAgent>();
         animancerComponent = enemyModel.GetComponent<AnimancerComponent>();
+    }
+
+    public void AddDefaulStats() {
+        enemyStatsManager.AddDefaultStats();
+        enemyUIController.UpdateHealthUI(
+            _currentHP: enemyStatsManager.Health.Value,
+            _maxHP: enemyStatsManager.MaxHealth.Value
+        );
+    }
+
+    public void SetNavigationDefaultStats() {
+        attackRange = isEnemyRange ? distanceToAttackRange : distanceToAttackMelee;
+        enemyAgent.stoppingDistance = attackRange;
+        enemyAgent.radius = attackRange;
+        enemyAgent.speed = enemyStatsManager.Speed.Value;
+        enemyAgent.isStopped = false;
+    }
+
+    public void LookAtTarget() {
+        lookDirection = new Vector3(currentDestination.x, enemyParentContainer.transform.position.y, currentDestination.z);
+        enemyParentContainer.transform.LookAt(lookDirection);
+    }
+
+    public void RepatrolTheEnemy(int timeToMove) {
+        StopTheEnemy();
+        Invoke(nameof(GoToTarget), timeToMove);
+    }
+
+    public void GoToTarget() {
+        //TODO: Change animation if the enemy is chasing a player
+        enemyAgent.SetDestination(currentDestination);
+        enemyAgent.isStopped = false;
+        isEnemyMoving = true;
+        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Walk.ToString());
+        LookAtTarget();
+    }
+
+    public void StopTheEnemy() {
+        isEnemyMoving = false;
+        enemyAgent.isStopped = true;
+        enemyAgent.ResetPath();
+        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
+    }
+
+    public void EnemyTakeDamage(
+        PlayerStatsManager playerStatsManager,
+        PlayerStatsController playerStatsController,
+        float damage
+    ) {
+        damageTaken = new StatModifier(-damage, Global.StatModType.Flat, this);
+        enemyStatsManager.Health.AddModifier(damageTaken);
+
+        enemyUIController.UpdateHealthUI(
+            _currentHP: enemyStatsManager.Health.Value,
+            _maxHP: enemyStatsManager.MaxHealth.Value
+        );
+
+        if (enemyStatsManager.GetSetIsRegenPaused) {
+            enemyStatsManager.GetSetIsRegenPaused = false;
+
+            enemyStatsManager.GetSetHPCoroutine = Timing.RunCoroutine(enemyStatsManager.RegenStatCoroutine(
+                enemyStatsManager.Health,
+                enemyStatsManager.MaxHealth,
+                enemyStatsManager.HealthRegenValue
+            ));
+        }
+
+        /*if (enemyStatsManager.GetSetHPCoroutine == null) {
+            enemyStatsManager.GetSetHPCoroutine = T(enemyStatsManager.RegenStatCoroutine(
+                enemyStatsManager.Health,
+                enemyStatsManager.MaxHealth,
+                enemyStatsManager.HealthRegenValue
+            ));
+        }*/
     }
 
     #region Animation Player

@@ -15,6 +15,7 @@ public class PlayerStatsController : MonoBehaviour {
     private StatModifier mpStat;
     private SkillBaseCast skillBaseCast;
 
+
     #region GetSet Properties
     public Component GetSetSourceComponent {
         get { return sourceComponent; }

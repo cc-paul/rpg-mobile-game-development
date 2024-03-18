@@ -70,13 +70,13 @@ public class Ice_Crack : MonoBehaviour {
 
             if (currentTarget.transform.Find(Global.CONTROLLER) != null) {
                 /* If mobs is target */
-                /*enemyController = currentTarget.transform.Find(Global.CONTROLLER).gameObject;
+                enemyController = currentTarget.transform.Find(Global.CONTROLLER).gameObject;
                 enemyAI = enemyController.GetComponent<EnemyAI>();
                 enemyAI.EnemyTakeDamage(
                     playerStatsManager: skillBaseCast.GetSetPlayerStatsManager,
                     playerStatsController: skillBaseCast.GetSetPlayerStatsController,
                     damage: expectedDamage
-                );*/
+                );
                 isDamageApplied = true;
             } else if (currentTarget.transform.Find(Global.DUMMY) != null) {
                 isDamageApplied = true;

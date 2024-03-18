@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MEC;
 
 public class EnemyStatsManager : MonoBehaviour {
     [Header("Reusable Variable")]
@@ -21,12 +22,13 @@ public class EnemyStatsManager : MonoBehaviour {
 
     private EnemyUIController enemyUIController;
     private EnemyAI enemyAI;
-    private Coroutine regenHPCourotine;
+    private CoroutineHandle regenHPCourotine;
     private bool isEnemyDead;
+    private bool isRegenPaused = true;
 
 
     #region GetSet Properties
-    public Coroutine GetSetHPCoroutine {
+    public CoroutineHandle GetSetHPCoroutine {
         get { return regenHPCourotine; }
         set { regenHPCourotine = value; }
     }
@@ -35,6 +37,13 @@ public class EnemyStatsManager : MonoBehaviour {
         get { return isEnemyDead; }
         set { isEnemyDead = value; }
     }
+
+    public bool GetSetIsRegenPaused {
+        get { return isRegenPaused; }
+        set { isRegenPaused = value; }
+    }
+
+   
     #endregion
 
     private void Awake() {
@@ -50,8 +59,8 @@ public class EnemyStatsManager : MonoBehaviour {
         BaseDamage.BaseValue = baseDamage;
     }
 
-    public IEnumerator RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
-        while (stat.Value < maxStat.Value && (int)stat.Value != 0) {
+    public IEnumerator<float> RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
+        while (stat.Value < maxStat.Value && (int)stat.Value > 0 && enemyAI.GetSetEnemyParentContainer.activeSelf) {
             StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
             stat.AddModifier(regenModifier);
 
@@ -59,11 +68,13 @@ public class EnemyStatsManager : MonoBehaviour {
 
             if (stat.Value >= maxStat.Value) {
                 RecalibrateStat(stat, maxStat);
-                break;
             }
 
-            yield return new WaitForSeconds(0.2f);
+            yield return Timing.WaitForSeconds(0.2f);
         }
+
+        isRegenPaused = true;
+        Timing.PauseCoroutines(regenHPCourotine);
     }
 
     public void RecalibrateStat(CharacterStat stat, CharacterStat maxStat) {
