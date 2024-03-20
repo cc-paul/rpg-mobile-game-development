@@ -28,6 +28,7 @@ public class PlayerStatsManager : MonoBehaviour {
     [SerializeField] private float baseRegenHP = 0.5f;
     [SerializeField] private float baseRegenMP = 0.5f;
     [SerializeField] private float baseDamage = 100f;
+    [SerializeField] private float baseAttackSpeed = 1f;
     [SerializeField] private bool hasClan = false;
     [SerializeField] private string characterName = "";
     [SerializeField] private string clanName = "";
@@ -48,6 +49,7 @@ public class PlayerStatsManager : MonoBehaviour {
     public CharacterStat HealthRegenValue;
     public CharacterStat MPRegenValue;
     public CharacterStat BaseDamage;
+    public CharacterStat AttackSpeed;
 
     private WaitForSeconds regenDelayTimer = new WaitForSeconds(0.2f);
     private List<GameObject> currentMobsFollowingMe = new List<GameObject>();
@@ -149,6 +151,7 @@ public class PlayerStatsManager : MonoBehaviour {
         HealthRegenValue.BaseValue = baseRegenHP;
         MPRegenValue.BaseValue = baseRegenMP;
         BaseDamage.BaseValue = baseDamage;
+        AttackSpeed.BaseValue = baseAttackSpeed;
     }
 
     public IEnumerator RegenStatCoroutine(

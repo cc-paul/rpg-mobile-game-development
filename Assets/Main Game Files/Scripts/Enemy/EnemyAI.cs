@@ -19,23 +19,42 @@ public class EnemyAI : MonoBehaviour {
     [Header("AI Settings")]
     [SerializeField] private float distanceToAttackMelee = 3f;
     [SerializeField] private float distanceToAttackRange = 6f;
+    [SerializeField] private float addedSpeed;
     [SerializeField] private bool isEnemyRange;
 
     private float attackRange;
     private float attackDuration;
+    private float enemyDamage;
     private bool isEnemyMoving;
+    private bool isEnemyAttacking;
+    private int attackNumber;
+    private string attackName;
+    private string currentAnimationName = null;
     private GameObject enemyParentContainer;
     private Vector3 currentDestination;
     private Vector3 lookDirection;
+    private ClipTransition currentClipTransition = null;
 
     private EnemyStatsManager enemyStatsManager;
     private EnemyUIController enemyUIController;
     private NavMeshAgent enemyAgent;
     private AnimancerComponent animancerComponent;
+    private BoxCollider enemyBoxCollider;
+
+    /* Attacker Data */
+    private GameObject attackerController;
+    private PlayerStatsController attackerStatsController;
+    private PlayerStatsManager attackerStatsManager;
 
     private StatModifier damageTaken;
+    private StatModifier addedChaseSpeed;
 
     #region GetSet Properties 
+    public GameObject GetSetAttackerController {
+        get { return attackerController; }
+        set { attackerController = value; }
+    }
+
     public Vector3 GetSetCurrentDestination {
         get { return currentDestination; }
         set { currentDestination = value; }
@@ -55,6 +74,16 @@ public class EnemyAI : MonoBehaviour {
         get { return enemyParentContainer; }
         set { enemyParentContainer = value; }
     }
+
+    public bool GetSetIsEnemyAttacking {
+        get { return isEnemyAttacking; }
+        set { isEnemyAttacking = value; }
+    }
+
+    public EnemyStatsManager GetSetEnemyStatsManager {
+        get { return enemyStatsManager; }
+        set { enemyStatsManager = value; }
+    }
     #endregion
 
     private void Awake() {
@@ -64,15 +93,26 @@ public class EnemyAI : MonoBehaviour {
         enemyUIController = GetComponent<EnemyUIController>();
         enemyStatsManager = GetComponent<EnemyStatsManager>();
         enemyAgent = enemyParentContainer.GetComponent<NavMeshAgent>();
+        enemyBoxCollider = enemyParentContainer.GetComponent<BoxCollider>();
         animancerComponent = enemyModel.GetComponent<AnimancerComponent>();
     }
 
     public void AddDefaulStats() {
+        enemyBoxCollider.enabled = true;
+        enemyAgent.ResetPath();
+        isEnemyMoving = true;
+        isEnemyAttacking = false;
         enemyStatsManager.AddDefaultStats();
         enemyUIController.UpdateHealthUI(
             _currentHP: enemyStatsManager.Health.Value,
             _maxHP: enemyStatsManager.MaxHealth.Value
         );
+    }
+
+    private void AddBoostingStats() {
+        addedChaseSpeed = new StatModifier(addedSpeed,Global.StatModType.Flat,this);
+        enemyStatsManager.Speed.AddModifier(addedChaseSpeed);
+        SetNavigationDefaultStats();
     }
 
     public void SetNavigationDefaultStats() {
@@ -94,11 +134,14 @@ public class EnemyAI : MonoBehaviour {
     }
 
     public void GoToTarget() {
-        //TODO: Change animation if the enemy is chasing a player
+        if (enemyStatsManager.Health.Value <= 0) return;
+        if (isEnemyAttacking) return;
+
         enemyAgent.SetDestination(currentDestination);
         enemyAgent.isStopped = false;
         isEnemyMoving = true;
-        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Walk.ToString());
+        isEnemyAttacking = false;
+        PlayEnemyAnimation(_currentAnimationName: attackerController == null ? Global.EnemyAnimation.Enemy_Walk.ToString() : Global.EnemyAnimation.Enemy_Chase.ToString());
         LookAtTarget();
     }
 
@@ -107,6 +150,44 @@ public class EnemyAI : MonoBehaviour {
         enemyAgent.isStopped = true;
         enemyAgent.ResetPath();
         PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
+    }
+
+    public void StopFollowingTheAttacker() {
+        if (attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+            attackerStatsManager.GetSetCurrentMobsFollowingMe.Remove(enemyParentContainer);
+        }
+
+        attackerController = null;
+        attackerStatsController = null;
+        attackerStatsManager = null;
+        isEnemyAttacking = false;
+        isEnemyMoving = true;
+        enemyStatsManager.Speed.RemoveModifier(addedChaseSpeed);
+        SetNavigationDefaultStats();
+    }
+
+    public void EnemyIsDie() {
+        enemyAgent.isStopped = true;
+        isEnemyMoving = false;
+        isEnemyAttacking = false;
+        enemyBoxCollider.enabled = false;
+        enemyStatsManager.GetSetIsRegenPaused = true;
+        enemyStatsManager.Speed.RemoveModifier(addedChaseSpeed);
+
+        if (attackerController != null) {
+            if (attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+                attackerStatsManager.GetSetCurrentMobsFollowingMe.Remove(enemyParentContainer);
+            }
+        }
+
+        Timing.PauseCoroutines(enemyStatsManager.GetSetHPCoroutine);
+        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Death.ToString());
+
+        Invoke(nameof(DisableEnemy),4f);
+    }
+
+    public void DisableEnemy() {
+        enemyParentContainer.gameObject.SetActive(false);
     }
 
     public void EnemyTakeDamage(
@@ -132,20 +213,72 @@ public class EnemyAI : MonoBehaviour {
             ));
         }
 
-        /*if (enemyStatsManager.GetSetHPCoroutine == null) {
-            enemyStatsManager.GetSetHPCoroutine = T(enemyStatsManager.RegenStatCoroutine(
-                enemyStatsManager.Health,
-                enemyStatsManager.MaxHealth,
-                enemyStatsManager.HealthRegenValue
-            ));
-        }*/
+        if (attackerController == null && playerStatsManager.GetSetCurrentMobsFollowingMe.Count < playerStatsManager.GetSetMaxTargetToLure) {
+            if (enemyStatsManager.Health.Value <= 0) {
+                EnemyIsDie();
+            } else {
+                attackerController = playerStatsManager.transform.parent.transform.Find(Global.CONTROLLER).gameObject;
+                attackerStatsController = playerStatsController;
+                attackerStatsManager = playerStatsManager;
+
+                if (!attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+                    attackerStatsManager.GetSetCurrentMobsFollowingMe.Add(enemyParentContainer);
+                }
+
+                StopTheEnemy();
+                AddBoostingStats();
+            }
+        }
     }
+
+    public void AttackTheAttacker() {
+        if (enemyStatsManager.Health.Value <= 0) return;
+        if (isEnemyAttacking) return;
+
+        isEnemyAttacking = true;
+        isEnemyMoving = false;
+        enemyAgent.isStopped = true;
+        attackNumber = Random.Range(1, 4);
+        attackName = $"Attack{attackNumber}_Animation";
+
+        enemyAgent.ResetPath();
+        PlayEnemyAnimation(_currentAnimationName: attackName);
+    }
+
+    public void DealDamage() {
+        enemyDamage = enemyStatsManager.BaseDamage.Value;
+
+        attackerStatsController.ReceiveDamage(_damageAmount: enemyDamage,_sourceComponent: this);
+    }
+
+
 
     #region Animation Player
     public void PlayEnemyAnimation(string _currentAnimationName) {
-        ClipTransition currentClipTransition = null;
+        if (currentAnimationName == _currentAnimationName) return;
 
-        var animationClipInfo = enemyAnimation.Find(
+        float rowClipTransitionLength;
+        string rowAnimationName;
+        ClipTransition rowClipTransition;
+
+        for (int animation_i = 0; animation_i < enemyAnimation.Count; animation_i++) {
+            rowAnimationName = enemyAnimation[animation_i].animationName.ToString();
+
+            if (rowAnimationName == _currentAnimationName) {
+                rowClipTransition = enemyAnimation[animation_i].clipTransition;
+                rowClipTransitionLength = rowClipTransition.Length;
+                attackDuration = rowClipTransitionLength;
+
+                if (currentClipTransition != rowClipTransition) {
+                    currentClipTransition = rowClipTransition;
+                    animancerComponent.Play(rowClipTransition);
+                    currentAnimationName = rowAnimationName;
+                }
+                break;
+            }
+        }
+
+/*        var animationClipInfo = enemyAnimation.Find(
             clipInfo => clipInfo.animationName.ToString() == _currentAnimationName
         );
 
@@ -158,7 +291,7 @@ public class EnemyAI : MonoBehaviour {
             animancerComponent.Play(currentClipTransition);
         } else {
             Debug.LogWarning("Animation not found: " + _currentAnimationName);
-        }
+        }*/
     }
     #endregion
 }

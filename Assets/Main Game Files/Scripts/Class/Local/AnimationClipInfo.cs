@@ -5,6 +5,7 @@ using UnityEngine;
 
 [System.Serializable]
 public class AnimationClipInfo<TEnum> where TEnum : System.Enum {
+    public string name;
     public TEnum animationName;
     public ClipTransition clipTransition;
 

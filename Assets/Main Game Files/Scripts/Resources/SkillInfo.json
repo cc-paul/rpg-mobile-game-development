@@ -226,7 +226,7 @@
 							{
 								"id" : 10,
 								"displayName" : "Swords Blessing",
-								"defaultCooldown" : 25,
+								"defaultCooldown" : 15,
 								"baseDamage" : 1200,
 								"indicatorType" : "Area",
 								"maxTarget" : 8,
@@ -235,7 +235,7 @@
 								"addedHP" : 0,
 								"forAlly" : false,
 								"deactivationTime" : 0,
-								"mpConsumption" : 180,
+								"mpConsumption" : 100,
 								"addedSpeed" : 0,
 								"deductedSpeed" : 0,
 								"distanceToCast" : 0,

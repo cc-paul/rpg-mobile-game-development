@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine;
+using MEC;
 
 public class FPSDisplay : MonoBehaviour {
     [Header("UI")]
@@ -15,7 +16,6 @@ public class FPSDisplay : MonoBehaviour {
     private int roundedMsec;
     private string textFps;
     private float deltaTime = 0f;
-    private WaitForSeconds fpsDelayDuration = new WaitForSeconds(1f);
 
 
     private void Awake() {
@@ -23,12 +23,12 @@ public class FPSDisplay : MonoBehaviour {
     }
 
     private void Start() {
-        StartCoroutine(nameof(CalculateFPS));
+        Timing.RunCoroutine(CalculateFPS());
     }
 
-    private IEnumerator CalculateFPS() {
+    private IEnumerator<float> CalculateFPS() {
         while (true) {
-            yield return fpsDelayDuration;
+            yield return Timing.WaitForSeconds(1f);
 
             deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.01f;
             msec = deltaTime * 1000f;
@@ -42,7 +42,7 @@ public class FPSDisplay : MonoBehaviour {
                 roundedFps = targetFPS - 1;
             }
 
-            textFps = string.Format($"{roundedMsec} MS ({roundedFps} FPS)");
+            textFps = $"{roundedMsec} MS ({roundedFps} FPS)";
             txtFps.text = textFps;
         }
     }

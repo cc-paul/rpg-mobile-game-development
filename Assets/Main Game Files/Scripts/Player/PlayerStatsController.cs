@@ -34,7 +34,7 @@ public class PlayerStatsController : MonoBehaviour {
         UpdateHealthUI();
     }
 
-    private void ReceiveDamage(float _damageAmount) {
+    public void ReceiveDamage(float _damageAmount,Component _sourceComponent) {
         damageStat = new StatModifier(-_damageAmount, Global.StatModType.Flat, this);
         playerStatsManager.Health.AddModifier(damageStat);
         skillBaseCast.DisplayDamage(damageTextPosition:skillBaseCast.GetSetTargetManager.GetSetPlayerPosition,damage:_damageAmount);
@@ -54,7 +54,7 @@ public class PlayerStatsController : MonoBehaviour {
                 StopCoroutine(playerStatsManager.GetSetMPCoroutine);
             }
 
-            if (sourceComponent as TestHealAndDamage) {
+            if (_sourceComponent as TestHealAndDamage) {
 
             }
         } else {
@@ -135,7 +135,7 @@ public class PlayerStatsController : MonoBehaviour {
 
     private IEnumerator TakeContiniousDamage() {
         while (true) {
-            ReceiveDamage(_damageAmount: Random.Range(100f,800f));
+            ReceiveDamage(_damageAmount: Random.Range(100f,800f),_sourceComponent: this);
 
             if (playerStatsManager.Health.Value <= 0f) {
                 break;

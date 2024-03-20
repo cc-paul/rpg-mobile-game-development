@@ -1803,15 +1803,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 107454690}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec28b88dd38b46a4e81d9183b9606936, type: 3}
+  m_Script: {fileID: 11500000, guid: a18412ed69caa8d489802f29165c4674, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: 11
-  position: {x: 337.2, y: 15}
-  alignment: 1
-  colour: {r: 0.028301895, g: 0.028301895, b: 0.028301895, a: 1}
-  updateInterval: 0.5
-  textMesh: {fileID: 2077253313}
+  txtFps: {fileID: 2077253313}
 --- !u!1 &109148236 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2707213899275116671, guid: b1a28d5e5e0af2a44a196abd2290456f, type: 3}
@@ -3087,7 +3082,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pools:
   - prefab: {fileID: 5289478309129940290, guid: 66c6119c7a0cc3d409da287f743534e7, type: 3}
-    size: 300
+    size: 500
 --- !u!114 &169531456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3102,7 +3097,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 5289478309129940290, guid: 66c6119c7a0cc3d409da287f743534e7, type: 3}
   spawnArea: {fileID: 1887751534}
-  enemySpawnCount: 100
+  enemySpawnCount: 500
   enemySpawnCountOnEditor: 100
 --- !u!1001 &171102151
 PrefabInstance:
@@ -27823,6 +27818,7 @@ MonoBehaviour:
   baseRegenHP: 0.5
   baseRegenMP: 0.5
   baseDamage: 100
+  baseAttackSpeed: 1
   hasClan: 0
   characterName: Paul<3Andrea
   clanName: 
@@ -27842,6 +27838,8 @@ MonoBehaviour:
   MPRegenValue:
     BaseValue: 0
   BaseDamage:
+    BaseValue: 0
+  AttackSpeed:
     BaseValue: 0
 --- !u!114 &1721794110
 MonoBehaviour:
@@ -27889,7 +27887,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   swordsmanNormalAttackAnimation:
-  - animationName: 0
+  - name: Sword Base Idle
+    animationName: 0
     clipTransition:
       _FadeDuration: 0
       _Events:
@@ -27899,7 +27898,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 4ea9dc1cd825ee8449f73f27015a8d3b, type: 2}
       _Speed: NaN
       _NormalizedStartTime: NaN
-  - animationName: 6
+  - name: Walk No Sword
+    animationName: 6
     clipTransition:
       _FadeDuration: 0
       _Events:
@@ -27909,7 +27909,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 73a44ce012bcef84496059b429ff1ecf, type: 2}
       _Speed: NaN
       _NormalizedStartTime: NaN
-  - animationName: 3
+  - name: Run No Sword
+    animationName: 3
     clipTransition:
       _FadeDuration: 0
       _Events:
@@ -27919,7 +27920,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: a29bb182887e3624e8e44654ca16a4df, type: 2}
       _Speed: NaN
       _NormalizedStartTime: NaN
-  - animationName: 1
+  - name: Idle Sword
+    animationName: 1
     clipTransition:
       _FadeDuration: 0
       _Events:
@@ -27929,7 +27931,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 9e54e928f248dc1479066590f7a47bfe, type: 2}
       _Speed: NaN
       _NormalizedStartTime: NaN
-  - animationName: 4
+  - name: Run Sword
+    animationName: 4
     clipTransition:
       _FadeDuration: 0
       _Events:
@@ -27939,7 +27942,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 42a0a73323ebf3d4d85d630b115a4a55, type: 2}
       _Speed: NaN
       _NormalizedStartTime: NaN
-  - animationName: 5
+  - name: Walk Sword
+    animationName: 5
     clipTransition:
       _FadeDuration: 0
       _Events:
@@ -27950,7 +27954,8 @@ MonoBehaviour:
       _Speed: NaN
       _NormalizedStartTime: NaN
   swordsmanSkillAttackAnimation:
-  - animationName: 2
+  - name: Ice Crack
+    animationName: 2
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28019,7 +28024,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: c7cdd7efc598ca845a7a53d7dd9b1486, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 3
+  - name: Lightning Strike
+    animationName: 3
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28088,7 +28094,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 0f8d9221654ad574d9823a2e8b6a4600, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 0
+  - name: Ground Impact
+    animationName: 0
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28197,15 +28204,16 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 787c74a5fe520854ebadf9cb5c4f59d9, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 7
+  - name: Whirlwind
+    animationName: 7
     clipTransition:
       _FadeDuration: 0.25
       _Events:
         _NormalizedTimes:
-        - 0.02702703
-        - 0.23938224
-        - 0.48648652
-        - 0.74131274
+        - 0.06428572
+        - 0.22500001
+        - 0.43571427
+        - 0.67142856
         - 0.99999994
         _Callbacks:
         - m_PersistentCalls:
@@ -28314,23 +28322,16 @@ MonoBehaviour:
                 m_StringArgument: 
                 m_BoolArgument: 0
               m_CallState: 2
-            - m_Target: {fileID: 342407177}
-              m_TargetAssemblyTypeName: Whirlwind, Assembly-CSharp
-              m_MethodName: ReactivateSword
-              m_Mode: 1
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 0
-              m_CallState: 2
-        _Names: []
-      _Clip: {fileID: 7400000, guid: 8d566b181be86494787d2d668b7ddbe3, type: 2}
+        _Names:
+        - Show Wind
+        - Show Hit and Damage
+        - Show Hit and Damage
+        - Show Hit and Damage
+      _Clip: {fileID: 7400000, guid: e5b89bfdc035fb04da3fb2152509184a, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 8
+  - name: Lightning Orb
+    animationName: 8
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28403,7 +28404,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 79fccbf78f0dd81458fc7804e91dc9be, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 6
+  - name: Ice Down Wave
+    animationName: 6
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28484,7 +28486,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 7951b575966984149afd87828768675f, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 5
+  - name: Speed Up
+    animationName: 5
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28537,7 +28540,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: b164cfc24092ca24abb5e742cbc2b0e3, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 4
+  - name: Health Up
+    animationName: 4
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28590,7 +28594,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 5db0e5a69fddceb4db3355090a369c1d, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 9
+  - name: Berserk Aura
+    animationName: 9
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -28643,7 +28648,8 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 99c0df1054b32024fa113a6498eaff6c, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  - animationName: 10
+  - name: Swords Blessing
+    animationName: 10
     clipTransition:
       _FadeDuration: 0.25
       _Events:
@@ -33381,7 +33387,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'FPS: 15.77 (63.41 ms)'
+  m_text: 'FPS: 0.75 (1332.77 ms)'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7889dfadaf64a074d957dcce878fa38d, type: 2}
   m_sharedMaterial: {fileID: -5725376461756623916, guid: 7889dfadaf64a074d957dcce878fa38d, type: 2}
