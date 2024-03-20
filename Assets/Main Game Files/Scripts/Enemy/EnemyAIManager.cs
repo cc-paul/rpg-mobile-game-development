@@ -72,17 +72,34 @@ public class EnemyAIManager : MonoBehaviour {
                 currentEnemy = enemySpawnParent.transform.GetChild(enemyChild_i).gameObject;
 
                 if (currentEnemy.activeSelf) {
-                    timeToMove = Random.Range(1,3);
                     controller = currentEnemy.transform.Find(Global.CONTROLLER).gameObject;
                     enemyAI = controller.GetComponent<EnemyAI>();
-                    enemyAI.GetSetCurrentDestination = GetRandomSpawnPosition();
 
-                    if (enemyAI.GetSetIsEnemyMoving) {
-                        if (enemyAI.GetSetEnemyAgent.remainingDistance <= enemyAI.GetSetEnemyAgent.stoppingDistance) {
-                            enemyAI.RepatrolTheEnemy(timeToMove: timeToMove);
+                    if (enemyAI.GetSetEnemyStatsManager.Health.Value > 0) {
+                        if (enemyAI.GetSetAttackerController == null) {
+                            timeToMove = Random.Range(1, 3);
+
+                            if (enemyAI.GetSetIsEnemyMoving) {
+                                if (enemyAI.GetSetEnemyAgent.remainingDistance <= enemyAI.GetSetEnemyAgent.stoppingDistance) {
+                                    enemyAI.GetSetCurrentDestination = GetRandomSpawnPosition();
+                                    enemyAI.RepatrolTheEnemy(timeToMove: timeToMove);
+                                }
+                            } else {
+                                enemyAI.RepatrolTheEnemy(timeToMove: timeToMove);
+                            }
+                        } else {
+                            enemyAI.GetSetCurrentDestination = enemyAI.GetSetAttackerController.transform.position;
+                            enemyAI.GoToTarget();
+
+                            if (enemyAI.GetSetEnemyAgent.remainingDistance <= enemyAI.GetSetEnemyAgent.stoppingDistance && !enemyAI.GetSetIsEnemyAttacking) {
+                                enemyAI.AttackTheAttacker();
+                            } else if (enemyAI.GetSetEnemyAgent.remainingDistance > 20f) {
+                                enemyAI.StopTheEnemy();
+                                enemyAI.StopFollowingTheAttacker();
+                            }
                         }
                     } else {
-                        enemyAI.RepatrolTheEnemy(timeToMove: timeToMove);
+                        enemyAI.EnemyIsDie();
                     }
                 }
             }

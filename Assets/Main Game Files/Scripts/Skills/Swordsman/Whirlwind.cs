@@ -29,7 +29,7 @@ public class Whirlwind : MonoBehaviour {
         skillBaseCast.InitializeCancelDelay();
         skillBaseCast.GetSetBasicAnimation.InitializeRerturnToNonCombat();
         skillBaseCast.GetSetTargetManager.LookAtNearestTarget();
-        skillBaseCast.GetSetWeaponWeilding.ChangeWeaponVisibility(isAttackMode: false); //To put the sword on the back because this skill is for brawler only
+        skillBaseCast.GetSetWeaponWeilding.ChangeWeaponVisibility(isAttackMode: true);
 
         skillBaseCast.GetSetAnimationPlayer.PlayAnimationByName(
             _currentAnimationName: Global.SwordsmanSkillAnimation.Whirlwind.ToString(),

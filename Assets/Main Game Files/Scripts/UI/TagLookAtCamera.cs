@@ -10,6 +10,7 @@ public class TagLookAtCamera : MonoBehaviour {
     private Vector3 vectorForward = Vector3.forward;
     private Vector3 vectorUp = Vector3.up;
     private Vector3 vectorOne = Vector3.one;
+    private Quaternion cameraRotaion;
     private float scaleFactor;
     private float scaleFactorHP;
     private float finalScale;
@@ -27,11 +28,13 @@ public class TagLookAtCamera : MonoBehaviour {
     }
 
     private void LateUpdate() {
+        cameraRotaion = camera.transform.rotation;
+
         for (int i = 0; i < nameTagInfoList.Count; i++) {
             if (nameTagInfoList[i].uiTag.gameObject.activeSelf) {
                 nameTagInfoList[i].uiTag.LookAt(
                     nameTagInfoList[i].uiTag.position + camera.transform.rotation * vectorForward,
-                    camera.transform.rotation * vectorUp
+                    cameraRotaion * vectorUp
                 );
 
                 distance = Vector3.Distance(nameTagInfoList[i].uiTag.position, camera.transform.position);

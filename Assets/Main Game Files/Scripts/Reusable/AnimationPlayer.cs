@@ -12,6 +12,7 @@ public class AnimationPlayer : MonoBehaviour {
     
     [Header("Swordsman Skill Animations")]
     [SerializeField] private List<AnimationClipInfo<Global.SwordsmanSkillAnimation>> swordsmanSkillAttackAnimation = new List<AnimationClipInfo<Global.SwordsmanSkillAnimation>>();
+    [SerializeField] private Dictionary<Global.SwordsmanSkillAnimation, AnimationClipInfo<Global.SwordsmanSkillAnimation>> swordsmanSkillAttackAnimation2 = new Dictionary<Global.SwordsmanSkillAnimation, AnimationClipInfo<Global.SwordsmanSkillAnimation>>();
 
     [Space(2)]
 
@@ -27,6 +28,7 @@ public class AnimationPlayer : MonoBehaviour {
     private WaitForSeconds skillCastNullWait = new WaitForSeconds(0f);
     private PlayerStatsManager playerStatsManager;
     private Coroutine castingCoroutine;
+    private ClipTransition currentClipTransition = null;
     private float expectedCooldown = 0;
     private float timer;
 
@@ -35,34 +37,36 @@ public class AnimationPlayer : MonoBehaviour {
     }
 
     public void PlayAnimationByName(string _currentAnimationName,bool _isNormalAnimation) {
-        ClipTransition currentClipTransition = null;
+        float rowClipTransitionLength;
+        string rowAnimationName;
+        ClipTransition rowClipTransition;
 
         if (_isNormalAnimation) {
-            var animationClipInfo = swordsmanNormalAttackAnimation.Find(
-                clipInfo => clipInfo.animationName.ToString() == _currentAnimationName
-            );
+            for (int animation_i = 0; animation_i < swordsmanNormalAttackAnimation.Count; animation_i++) {
+                rowAnimationName = swordsmanNormalAttackAnimation[animation_i].animationName.ToString();
 
-            if (animationClipInfo != null) {
-                currentClipTransition = animationClipInfo.clipTransition;
+                if (rowAnimationName == _currentAnimationName) {
+                    rowClipTransition = swordsmanNormalAttackAnimation[animation_i].clipTransition;
+                    if (currentClipTransition != rowClipTransition) {
+                        animancerComponent.Play(rowClipTransition);
+                    }
+                    break;
+                }
             }
         } else {
             if (playerStatsManager.GetSetCharacterType == Global.Characters.Swordsman) {
-                var animationClipInfo = swordsmanSkillAttackAnimation.Find(
-                    clipInfo => clipInfo.animationName.ToString() == _currentAnimationName
-                );
+                for (int animation_i = 0; animation_i < swordsmanSkillAttackAnimation.Count; animation_i++) {
+                    rowAnimationName = swordsmanSkillAttackAnimation[animation_i].animationName.ToString();
 
-                if (animationClipInfo != null) {
-                    currentClipTransition = animationClipInfo.clipTransition;
-                    expectedCooldown = currentClipTransition.Length;
-                    InitializeCastingProgress();
+                    if (rowAnimationName == _currentAnimationName) {
+                        rowClipTransition = swordsmanSkillAttackAnimation[animation_i].clipTransition;
+                        expectedCooldown = rowClipTransition.Length / playerStatsManager.AttackSpeed.Value;
+                        InitializeCastingProgress();
+                        animancerComponent.Play(rowClipTransition);
+                        break;
+                    }
                 }
             }
-        }
-
-        if (currentClipTransition != null) {
-            animancerComponent.Play(currentClipTransition);
-        } else {
-            Debug.LogWarning("Animation not found: " + _currentAnimationName);
         }
     }
 

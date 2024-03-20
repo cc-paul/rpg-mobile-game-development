@@ -9,6 +9,9 @@ public class NameTagAdder : MonoBehaviour {
     private TagLookAtCamera tagLookAtCamera;
     private GameObject basicInfoUI;
     private Transform nameAndHPHolder;
+    private Transform currentNameInfoTag;
+    private Transform currentNameInfoTagMain;
+    private bool isAlreadyAdded;
 
     private void Awake() {
         tagLookAtCamera = FindAnyObjectByType<TagLookAtCamera>();
@@ -24,9 +27,25 @@ public class NameTagAdder : MonoBehaviour {
                 AddOnLookAtCamera(uiInfo: nameTagInfo.uiTag, uiIsHP: false);
             }
         }
+
+        /*for (int nameTagInfo_i = 0; nameTagInfo_i < nameTagInfoList.Count; nameTagInfo_i++) {
+            currentNameInfoTag = nameTagInfoList[nameTagInfo_i].uiTag;
+
+            for (int nameTagInfoMain_i = 0; nameTagInfoMain_i < tagLookAtCamera.GetSetNameTagInfoList.Count; nameTagInfoMain_i++) {
+                currentNameInfoTagMain = tagLookAtCamera.GetSetNameTagInfoList[nameTagInfo_i].uiTag;
+
+                if (currentNameInfoTagMain == currentNameInfoTag) {
+                    isAlreadyAdded = true;
+                }
+            }
+
+            if (!isAlreadyAdded) {
+                AddOnLookAtCamera(uiInfo: currentNameInfoTag, uiIsHP: nameTagInfoList[nameTagInfo_i].isHP);
+            }
+        }*/
     }
 
-    public void AddOnLookAtCamera(Transform uiInfo, bool uiIsHP) {
+    private void AddOnLookAtCamera(Transform uiInfo, bool uiIsHP) {
         tagLookAtCamera.GetSetNameTagInfoList.Add(new NameTagInfo {
             uiTag = uiInfo,
             isHP = uiIsHP
