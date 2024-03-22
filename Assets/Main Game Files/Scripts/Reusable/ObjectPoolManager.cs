@@ -46,6 +46,20 @@ public class ObjectPoolManager : MonoBehaviour {
         }
     }
 
+    public void UnecessaryPoolCall(int size,GameObject currentObject,string objName,GameObject skillContentContainer) {
+        poolDictionary = new Dictionary<string, Queue<GameObject>>();
+
+        objectPool = new Queue<GameObject>();
+        
+        for (int i = 0; i < size; i++) {
+            obj = Instantiate(currentObject, skillContentContainer.transform);
+            obj.SetActive(false);
+            objectPool.Enqueue(obj);
+        }
+
+        poolDictionary.Add(objName, objectPool);
+    }
+
     public GameObject SpawnFromPool(string tag) {
         objectToSpawn = poolDictionary[tag].Dequeue();
         poolDictionary[tag].Enqueue(objectToSpawn);

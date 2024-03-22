@@ -20,7 +20,7 @@
 								"baseDamage" : 0,
 								"indicatorType" : "Area",
 								"maxTarget" : 1,
-								"areaRange" : 0.5,
+								"areaRange" : 0.7,
 								"includeInSkillList" : false,
 								"addedHP" : 0,
 								"forAlly" : false,
@@ -184,7 +184,7 @@
 							{
 								"id" : 8,
 								"displayName" : "Whirlwind",
-								"defaultCooldown" : 1,
+								"defaultCooldown" : 8,
 								"baseDamage" : 300,
 								"indicatorType" : "Area",
 								"maxTarget" : 8,

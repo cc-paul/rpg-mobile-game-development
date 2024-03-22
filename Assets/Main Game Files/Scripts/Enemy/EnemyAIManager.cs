@@ -13,6 +13,7 @@ public class EnemyAIManager : MonoBehaviour {
     [Header("Variable Declaration")]
     [SerializeField] private int enemySpawnCount = 100;
     [SerializeField] private int enemySpawnCountOnEditor = 100;
+    [SerializeField] private bool isEnemyInThisAreaAgressive = false;
 
     private ObjectPoolManager enemyPoolManager;
     private Bounds planeBounds;
@@ -49,6 +50,7 @@ public class EnemyAIManager : MonoBehaviour {
                 controller = enemyToSpawn.transform.Find(Global.CONTROLLER).gameObject;
                 enemyAI = controller.GetComponent<EnemyAI>();
 
+                enemyAI.GetSetIsEnemyAgressive = isEnemyInThisAreaAgressive;
                 enemyAI.PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
                 enemyAI.AddDefaulStats();
                 enemyAI.SetNavigationDefaultStats();
@@ -78,6 +80,10 @@ public class EnemyAIManager : MonoBehaviour {
                     if (enemyAI.GetSetEnemyStatsManager.Health.Value > 0) {
                         if (enemyAI.GetSetAttackerController == null) {
                             timeToMove = Random.Range(1, 3);
+
+                            if (enemyAI.GetSetIsEnemyAgressive) {
+                                enemyAI.CheckNearbyPlayer();
+                            }
 
                             if (enemyAI.GetSetIsEnemyMoving) {
                                 if (enemyAI.GetSetEnemyAgent.remainingDistance <= enemyAI.GetSetEnemyAgent.stoppingDistance) {

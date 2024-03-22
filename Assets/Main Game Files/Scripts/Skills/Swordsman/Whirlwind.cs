@@ -90,10 +90,6 @@ public class Whirlwind : MonoBehaviour {
         }
     }
 
-    public void ReactivateSword() {
-        skillBaseCast.GetSetWeaponWeilding.ChangeWeaponVisibility(isAttackMode: true);
-    }
-
     public void ReturnToCombatMode() {
         skillBaseCast.GetSetIsCastingSkill = false;
         skillBaseCast.GetSetBasicAnimation.PlayBasicAnimation(_animationCategory: Global.AnimationCategory.Idle);

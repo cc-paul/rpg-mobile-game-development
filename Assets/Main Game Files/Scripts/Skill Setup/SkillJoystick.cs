@@ -134,7 +134,7 @@ public class SkillJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, I
             ResetSkillJoyStick();
             return;
         }
-        if (skillCommand.GetSetIsCoolingDown) {
+        if (skillCommand.GetSetIsCoolingDown && !skillCommand.GetSetIsNormalAttack) {
             skillCommand.GetSetMessageBoxManager.ShowMessage(currentMessage: Global.MESSAGE_COOLDOWN);
             return;
         }

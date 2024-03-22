@@ -157,6 +157,10 @@ public class SkillCommand : MonoBehaviour {
         dragCounter = 0;
         expectedCooldown = skillReference.GetSkillDefaultCoolDown(skillID: skillID);
 
+        if (isNormalAttack) {
+            skillBaseCast.GetSetIsNormalAttacking = false;
+        }
+
         skillBaseCast.CastSelectedSkill(_skillID: skillID);
         
         if (currentTargetIndicator != null) {
@@ -176,23 +180,19 @@ public class SkillCommand : MonoBehaviour {
     }
 
     public void RecalibrateCooldown() {
-        if (isNormalAttack) {
-            showTimerImage = false;
-        } else {
-            if (PlayerPrefs.HasKey(prefCooldownRef)) {
-                expectedCooldown = skillReference.GetSkillCoolDown(
-                    skillID: skillID,
-                    currentDateTime: dateAndTime.GetSkillReferenceDateTime(),
-                    skillDateTime: PlayerPrefs.GetString(prefCooldownRef)
-                );
-                showTimerImage = expectedCooldown > 0f;
+        if (PlayerPrefs.HasKey(prefCooldownRef)) {
+            expectedCooldown = skillReference.GetSkillCoolDown(
+                skillID: skillID,
+                currentDateTime: dateAndTime.GetSkillReferenceDateTime(),
+                skillDateTime: PlayerPrefs.GetString(prefCooldownRef)
+            );
+            showTimerImage = expectedCooldown > 0f;
 
-                if (showTimerImage) {
-                    InitializeCooldown();
-                }
-            } else {
-                showTimerImage = false;
+            if (showTimerImage) {
+                InitializeCooldown();
             }
+        } else {
+            showTimerImage = false;
         }
 
         timerImageCooldown.gameObject.SetActive(showTimerImage);

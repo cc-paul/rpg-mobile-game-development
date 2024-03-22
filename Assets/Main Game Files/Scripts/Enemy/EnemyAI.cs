@@ -8,6 +8,9 @@ using MEC;
 public class EnemyAI : MonoBehaviour {
     [Header("Game Object and Others")]
     [SerializeField] private GameObject enemyModel;
+    [SerializeField] private GameObject castingAreaForRange;
+    [SerializeField] private GameObject weaponToShoot;
+    [SerializeField] private GameObject hitPrefab;
 
     [Space(2)]
 
@@ -19,32 +22,51 @@ public class EnemyAI : MonoBehaviour {
     [Header("AI Settings")]
     [SerializeField] private float distanceToAttackMelee = 3f;
     [SerializeField] private float distanceToAttackRange = 6f;
+    [SerializeField] private float agressiveDistance;
     [SerializeField] private float addedSpeed;
     [SerializeField] private bool isEnemyRange;
+    [SerializeField] private bool isEnemyAgressive;
+    [SerializeField] private int attackEndRange;
 
+    [Space(2)]
+
+    [Header("Layer Mask")]
+    [SerializeField] private List<LayerMask> layersToAttack = new List<LayerMask>();
+
+    private float rowClipTransitionLength;
     private float attackRange;
     private float attackDuration;
     private float enemyDamage;
     private bool isEnemyMoving;
     private bool isEnemyAttacking;
+    private bool isGizmosDrawn;
+    private bool isPlayerInsideSphere;
     private int attackNumber;
     private string attackName;
     private string currentAnimationName = null;
     private GameObject enemyParentContainer;
     private Vector3 currentDestination;
     private Vector3 lookDirection;
+    private Global.EnemyAnimation rowAnimationName;
     private ClipTransition currentClipTransition = null;
+    private ClipTransition rowClipTransition = null;
+    private Collider[] colliders;
 
     private EnemyStatsManager enemyStatsManager;
     private EnemyUIController enemyUIController;
     private NavMeshAgent enemyAgent;
     private AnimancerComponent animancerComponent;
     private BoxCollider enemyBoxCollider;
+    private EnemyProjectile enemyProjectile;
 
     /* Attacker Data */
+    private GameObject attackerGeneralSettings;
     private GameObject attackerController;
+    private GameObject attackerController_Temp;
     private PlayerStatsController attackerStatsController;
+    private PlayerStatsController attackerStatsController_Temp;
     private PlayerStatsManager attackerStatsManager;
+    private PlayerStatsManager attackerStatsManager_Temp;
 
     private StatModifier damageTaken;
     private StatModifier addedChaseSpeed;
@@ -80,6 +102,11 @@ public class EnemyAI : MonoBehaviour {
         set { isEnemyAttacking = value; }
     }
 
+    public bool GetSetIsEnemyAgressive {
+        get { return isEnemyAgressive; }
+        set { isEnemyAgressive = value; }
+    }
+
     public EnemyStatsManager GetSetEnemyStatsManager {
         get { return enemyStatsManager; }
         set { enemyStatsManager = value; }
@@ -95,6 +122,12 @@ public class EnemyAI : MonoBehaviour {
         enemyAgent = enemyParentContainer.GetComponent<NavMeshAgent>();
         enemyBoxCollider = enemyParentContainer.GetComponent<BoxCollider>();
         animancerComponent = enemyModel.GetComponent<AnimancerComponent>();
+
+        if (weaponToShoot != null) {
+            enemyProjectile = weaponToShoot.GetComponent<EnemyProjectile>();
+        }
+
+        attackEndRange = attackEndRange + 1;
     }
 
     public void AddDefaulStats() {
@@ -238,11 +271,30 @@ public class EnemyAI : MonoBehaviour {
         isEnemyAttacking = true;
         isEnemyMoving = false;
         enemyAgent.isStopped = true;
-        attackNumber = Random.Range(1, 4);
+        attackNumber = Random.Range(1, attackEndRange);
         attackName = $"Attack{attackNumber}_Animation";
 
         enemyAgent.ResetPath();
         PlayEnemyAnimation(_currentAnimationName: attackName);
+    }
+
+    public void ShootTheEnemy() {
+        weaponToShoot.transform.position = castingAreaForRange.transform.position;
+        enemyProjectile.GetSetTargetEnemy = attackerController;
+        enemyProjectile.GetSetTargetEnemyPosition = attackerController.transform.position;
+        weaponToShoot.SetActive(true);
+    }
+
+    public void ShowHitExplosion() {
+        hitPrefab.transform.position = attackerController.transform.Find(Global.HITTING_AREA).transform.position;
+        hitPrefab.SetActive(true);
+
+        Invoke(nameof(HideExplosion),0.5f);
+    }
+
+    private void HideExplosion() {
+        hitPrefab.SetActive(false);
+        hitPrefab.transform.position = Vector3.zero;
     }
 
     public void DealDamage() {
@@ -251,47 +303,62 @@ public class EnemyAI : MonoBehaviour {
         attackerStatsController.ReceiveDamage(_damageAmount: enemyDamage,_sourceComponent: this);
     }
 
+    public void CheckNearbyPlayer() {
+        for (int layer_i = 0; layer_i < layersToAttack.Count; layer_i++) {
+            isPlayerInsideSphere = Physics.CheckSphere(transform.position, agressiveDistance, layersToAttack[layer_i]);
 
+            if (isPlayerInsideSphere) {
+                colliders = Physics.OverlapSphere(transform.position, agressiveDistance, layersToAttack[layer_i]);
+                if (colliders.Length > 0) {
+                    attackerController_Temp = colliders[0].transform.parent.transform.Find(Global.CONTROLLER).gameObject;
+                    attackerGeneralSettings = colliders[0].transform.parent.transform.Find(Global.GENERAL_SETTINGS).gameObject;
+                    attackerStatsController_Temp = attackerGeneralSettings.GetComponent<PlayerStatsController>();
+                    attackerStatsManager_Temp = attackerGeneralSettings.GetComponent<PlayerStatsManager>();
+
+                    if (attackerController == null && attackerStatsManager_Temp.GetSetCurrentMobsFollowingMe.Count < attackerStatsManager_Temp.GetSetMaxTargetToLure) {
+                        attackerController = attackerController_Temp;
+                        attackerStatsController = attackerStatsController_Temp;
+                        attackerStatsManager = attackerStatsManager_Temp;
+
+                        if (!attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+                            attackerStatsManager.GetSetCurrentMobsFollowingMe.Add(enemyParentContainer);
+                        }
+
+                        StopTheEnemy();
+                        AddBoostingStats();
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    /*void OnDrawGizmosSelected() {
+        // Draw the sphere cast for visualization in the editor
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, agressiveDistance);
+    }*/
 
     #region Animation Player
     public void PlayEnemyAnimation(string _currentAnimationName) {
         if (currentAnimationName == _currentAnimationName) return;
 
-        float rowClipTransitionLength;
-        string rowAnimationName;
-        ClipTransition rowClipTransition;
-
         for (int animation_i = 0; animation_i < enemyAnimation.Count; animation_i++) {
-            rowAnimationName = enemyAnimation[animation_i].animationName.ToString();
+            rowAnimationName = enemyAnimation[animation_i].animationName;
 
-            if (rowAnimationName == _currentAnimationName) {
+            if (rowAnimationName.ToString() == _currentAnimationName) {
                 rowClipTransition = enemyAnimation[animation_i].clipTransition;
-                rowClipTransitionLength = rowClipTransition.Length;
+                rowClipTransitionLength = enemyAnimation[animation_i].clipLength;
                 attackDuration = rowClipTransitionLength;
 
                 if (currentClipTransition != rowClipTransition) {
                     currentClipTransition = rowClipTransition;
                     animancerComponent.Play(rowClipTransition);
-                    currentAnimationName = rowAnimationName;
+                    currentAnimationName = rowAnimationName.ToString();
                 }
                 break;
             }
         }
-
-/*        var animationClipInfo = enemyAnimation.Find(
-            clipInfo => clipInfo.animationName.ToString() == _currentAnimationName
-        );
-
-        if (animationClipInfo != null) {
-            attackDuration = animationClipInfo.clipTransition.Length;
-            currentClipTransition = animationClipInfo.clipTransition;
-        }
-
-        if (currentClipTransition != null) {
-            animancerComponent.Play(currentClipTransition);
-        } else {
-            Debug.LogWarning("Animation not found: " + _currentAnimationName);
-        }*/
     }
     #endregion
 }

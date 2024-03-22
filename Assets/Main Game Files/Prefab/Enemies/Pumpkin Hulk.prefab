@@ -324,6 +324,7 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: d16fb7916be601248a684a9338fcc209, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
+    clipLength: 0
   - name: Enemy Walk
     animationName: 3
     clipTransition:
@@ -335,6 +336,7 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 2e96ee13a529c284c942805bfc2717f3, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
+    clipLength: 0
   - name: Enemy Chase
     animationName: 8
     clipTransition:
@@ -346,6 +348,7 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: bad1c4458afebdd49b86b59609f1a32c, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
+    clipLength: 0
   - name: Attack 1
     animationName: 5
     clipTransition:
@@ -414,6 +417,7 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 5d7bbcb233ca572468c45dd99cb98686, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
+    clipLength: 0
   - name: Attack 2
     animationName: 6
     clipTransition:
@@ -482,6 +486,7 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: ae11252bbe6db254ea23bee578e3ea96, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
+    clipLength: 0
   - name: Attack 3
     animationName: 7
     clipTransition:
@@ -550,6 +555,7 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 9ca71be469a00ee48b47a42037fc41c6, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
+    clipLength: 0
   - name: Enemy Death
     animationName: 4
     clipTransition:
@@ -602,10 +608,19 @@ MonoBehaviour:
       _Clip: {fileID: 7400000, guid: 0f323d127880aa74d8bd24a60e4fa0aa, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
-  distanceToAttackMelee: 3
+    clipLength: 0
+  distanceToAttackMelee: 2
   distanceToAttackRange: 6
+  agressiveDistance: 7.32
   addedSpeed: 2
   isEnemyRange: 0
+  isEnemyAgressive: 1
+  attackEndRange: 3
+  layersToAttack:
+  - serializedVersion: 2
+    m_Bits: 8
+  - serializedVersion: 2
+    m_Bits: 16384
 --- !u!114 &5379863478567633568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -884,12 +899,12 @@ SkinnedMeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1539609292204690731}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 3
   m_RayTraceProcedural: 0
@@ -918,9 +933,9 @@ SkinnedMeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   serializedVersion: 2
-  m_Quality: 0
+  m_Quality: 2
   m_UpdateWhenOffscreen: 0
-  m_SkinnedMotionVectors: 1
+  m_SkinnedMotionVectors: 0
   m_Mesh: {fileID: 4300000, guid: 6f6cf0e6ee9e57a4197fd3caa7cbd70b, type: 2}
   m_Bones:
   - {fileID: 16978797033577840}
@@ -990,7 +1005,7 @@ SkinnedMeshRenderer:
   - {fileID: 4285255007674790031}
   - {fileID: 9057790194457986048}
   m_BlendShapeWeights: []
-  m_RootBone: {fileID: 0}
+  m_RootBone: {fileID: 16978797033577840}
   m_AABB:
     m_Center: {x: -0.0029776096, y: -0.09511125, z: 0.10734671}
     m_Extent: {x: 1.0655272, y: 0.99946475, z: 0.59321094}
@@ -2023,7 +2038,7 @@ LODGroup:
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.03161709
+  - screenRelativeHeight: 0.031818736
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 181012345510564075}
@@ -2083,7 +2098,7 @@ BoxCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 6143
+    m_Bits: 63487
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
@@ -2114,7 +2129,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 116
   m_CollisionDetection: 0
