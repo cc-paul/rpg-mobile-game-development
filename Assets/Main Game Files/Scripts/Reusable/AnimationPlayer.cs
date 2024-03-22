@@ -47,7 +47,8 @@ public class AnimationPlayer : MonoBehaviour {
 
                 if (rowAnimationName == _currentAnimationName) {
                     rowClipTransition = swordsmanNormalAttackAnimation[animation_i].clipTransition;
-                    if (currentClipTransition != rowClipTransition) {
+
+                    if (currentClipTransition != rowClipTransition || _currentAnimationName.Contains(Global.SWORD_NORMAN_ATTACK)) {
                         animancerComponent.Play(rowClipTransition);
                     }
                     break;

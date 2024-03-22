@@ -8,10 +8,10 @@ using MEC;
 public class FPSDisplay : MonoBehaviour {
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI txtFps;
+    [SerializeField] private int targetFPS = 30;
 
     private float fps;
     private float msec;
-    private int targetFPS = 61;
     private int roundedFps;
     private int roundedMsec;
     private string textFps;

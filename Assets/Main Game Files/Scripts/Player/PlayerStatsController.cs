@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using MEC;
 using UnityEngine;
 
 public class PlayerStatsController : MonoBehaviour {
@@ -45,20 +45,14 @@ public class PlayerStatsController : MonoBehaviour {
            1. Who is the source
            2. What is the current situation
         */
-        if (playerStatsManager.Health.Value <= 0) {
-            if (playerStatsManager.GetSetHPCoroutine != null) {
-                StopCoroutine(playerStatsManager.GetSetHPCoroutine);
-            }
+        if (playerStatsManager.Health.Value > 0 && playerStatsManager.Health.Value < playerStatsManager.MaxHealth.Value) {
+            Timing.ResumeCoroutines(playerStatsManager.GetSetHPCoroutine);
 
-            if (playerStatsManager.GetSetMPCoroutine != null) {
-                StopCoroutine(playerStatsManager.GetSetMPCoroutine);
-            }
-
-            if (_sourceComponent as TestHealAndDamage) {
+            if (_sourceComponent as TestHealAndManaRegen) {
 
             }
         } else {
-            RegenHP();
+            
         }
     }
 
@@ -72,7 +66,7 @@ public class PlayerStatsController : MonoBehaviour {
         mpStat = new StatModifier(-_mpAmount, Global.StatModType.Flat, this);
         playerStatsManager.MP.AddModifier(mpStat);
         UpdateHealthUI();
-        RegenMP();
+        Timing.ResumeCoroutines(playerStatsManager.GetSetMPCoroutine);
     }
 
     private void DisplayCharacterDetails() {
@@ -92,83 +86,7 @@ public class PlayerStatsController : MonoBehaviour {
         );
     }
 
-    public void RegenHP() {
-        if (playerStatsManager.GetSetHPCoroutine == null) {
-            playerStatsManager.GetSetHPCoroutine = playerStatsManager.GetSetHPCoroutine = 
-            StartCoroutine(playerStatsManager.RegenStatCoroutine(
-                playerStatsManager.Health,
-                playerStatsManager.MaxHealth,
-                playerStatsManager.HealthRegenValue,
-                Global.RegenCategory.HPRegen.ToString()
-            ));
-        }
-    }
-
-    public void RegenMP() {
-        if (playerStatsManager.GetSetMPCoroutine == null) {
-            playerStatsManager.GetSetMPCoroutine =
-            StartCoroutine(playerStatsManager.RegenStatCoroutine(
-                playerStatsManager.MP,
-                playerStatsManager.MaxMP,
-                playerStatsManager.MPRegenValue,
-                Global.RegenCategory.MPRegen.ToString()
-            ));
-        }
-    }
-
     public float GetTotalBaseDamage() {
         return playerStatsManager.BaseDamage.Value;
-    }
-
-
-    public void InitializeContiniousDamage(Component _sourceComponent) {
-        sourceComponent = _sourceComponent;
-        StopContiniousDamage();
-        coroutineTakeContiniousDamage = StartCoroutine(nameof(TakeContiniousDamage));
-    }
-
-    public void StopContiniousDamage() {
-        if (coroutineTakeContiniousDamage != null) {
-            StopCoroutine(coroutineTakeContiniousDamage);
-        }
-    }
-
-    private IEnumerator TakeContiniousDamage() {
-        while (true) {
-            ReceiveDamage(_damageAmount: Random.Range(100f,800f),_sourceComponent: this);
-
-            if (playerStatsManager.Health.Value <= 0f) {
-                break;
-            }
-
-            yield return new WaitForSeconds(4f);
-        }
-    }
-
-    public void InitializeContiniousHeal(Component _sourceComponent) {
-        sourceComponent = _sourceComponent;
-        StopContiniousHeal();
-
-        coroutineTakeContiniousHeal = StartCoroutine(nameof(TakeContiniousHeal));
-    }
-
-    public void StopContiniousHeal() {
-        if (coroutineTakeContiniousHeal != null) {
-            StopCoroutine(coroutineTakeContiniousHeal);
-        }
-    }
-
-    private IEnumerator TakeContiniousHeal() {
-        while (true) {
-            ReceiveHealth(_healthAmount: Random.Range(100f, 800f));
-
-            if (playerStatsManager.Health.Value >= playerStatsManager.MaxHealth.Value) {
-                playerStatsManager.RecalibrateStat(playerStatsManager.Health,playerStatsManager.MaxHealth);
-                UpdateHealthUI();
-                break;
-            }
-
-            yield return new WaitForSeconds(4f);
-        }
     }
 }

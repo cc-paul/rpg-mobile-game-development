@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using MEC;
 
 /*
     TODO: 
@@ -29,6 +29,8 @@ public class PlayerStatsManager : MonoBehaviour {
     [SerializeField] private float baseRegenMP = 0.5f;
     [SerializeField] private float baseDamage = 100f;
     [SerializeField] private float baseAttackSpeed = 1f;
+    [SerializeField] private float baseHPRegenSpeed = 1f;
+    [SerializeField] private float baseMPRegenSpeed = 1f;
     [SerializeField] private bool hasClan = false;
     [SerializeField] private string characterName = "";
     [SerializeField] private string clanName = "";
@@ -50,12 +52,14 @@ public class PlayerStatsManager : MonoBehaviour {
     public CharacterStat MPRegenValue;
     public CharacterStat BaseDamage;
     public CharacterStat AttackSpeed;
+    public CharacterStat BaseHPRegenSpeed;
+    public CharacterStat BaseMPRegenSpeed;
 
     private WaitForSeconds regenDelayTimer = new WaitForSeconds(0.2f);
     private List<GameObject> currentMobsFollowingMe = new List<GameObject>();
     private PlayerStatsController playerStatsController;
-    private Coroutine regenMPCourotine;
-    private Coroutine regenHPCourotine;
+    private CoroutineHandle regenMPCourotine;
+    private CoroutineHandle regenHPCourotine;
     private bool isPlayerDead;
 
     #region Character GetSet Properties
@@ -104,12 +108,12 @@ public class PlayerStatsManager : MonoBehaviour {
         set { maxTargetToLure = value; }
     }
 
-    public Coroutine GetSetHPCoroutine {
+    public CoroutineHandle GetSetHPCoroutine {
         get { return regenHPCourotine; }
         set { regenHPCourotine = value; }
     }
 
-    public Coroutine GetSetMPCoroutine {
+    public CoroutineHandle GetSetMPCoroutine {
         get { return regenMPCourotine; }
         set { regenMPCourotine = value; }
     }
@@ -131,7 +135,13 @@ public class PlayerStatsManager : MonoBehaviour {
         if (useInspectorStats) {
             //TODO: Uncheck this or if ever can remove because this is API based
             AddDefaultStats();
-        }  
+        }
+
+        regenHPCourotine = Timing.RunCoroutine(StartHPRegen());
+        regenMPCourotine = Timing.RunCoroutine(StartMPRegen());
+
+        Timing.PauseCoroutines(regenHPCourotine);
+        Timing.PauseCoroutines(regenMPCourotine);
     }
 
     private void OnEnable() {
@@ -152,33 +162,42 @@ public class PlayerStatsManager : MonoBehaviour {
         MPRegenValue.BaseValue = baseRegenMP;
         BaseDamage.BaseValue = baseDamage;
         AttackSpeed.BaseValue = baseAttackSpeed;
+        BaseHPRegenSpeed.BaseValue = baseHPRegenSpeed;
+        BaseMPRegenSpeed.BaseValue = baseMPRegenSpeed;
     }
 
-    public IEnumerator RegenStatCoroutine(
-        CharacterStat stat,
-        CharacterStat maxStat,
-        CharacterStat regenValue,
-        string regenCategory
-    ) {
-        while (stat.Value < maxStat.Value) {
-            StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
-            stat.AddModifier(regenModifier);
+    private IEnumerator<float> StartHPRegen() {
+        while (enabled) {
+            if (Health.Value < MaxHealth.Value) {
+                StatModifier regenModifier = new StatModifier(HealthRegenValue.Value, Global.StatModType.Flat, this);
+                Health.AddModifier(regenModifier);
+                playerStatsController.UpdateHealthUI();
 
-            playerStatsController.UpdateHealthUI();
-            //TODO: Stop also the regen if the player is dead
+                if (Health.Value >= MaxHealth.Value) {
+                    RecalibrateStat(Health, MaxHealth);
+                    playerStatsController.UpdateHealthUI();
+                    Timing.PauseCoroutines(regenHPCourotine);
+                }
+            }
+            yield return Timing.WaitForSeconds(BaseHPRegenSpeed.Value);
+        }
+    }
 
-            if (stat.Value >= maxStat.Value) {
-                if (regenCategory == Global.RegenCategory.HPRegen.ToString()) {
-                    regenHPCourotine = null;
-                } else if (regenCategory == Global.RegenCategory.MPRegen.ToString()) {
-                    regenMPCourotine = null;
+    private IEnumerator<float> StartMPRegen() {
+        while (enabled) {
+            if (MP.Value < MaxMP.Value) {
+                StatModifier regenModifier = new StatModifier(MPRegenValue.Value, Global.StatModType.Flat, this);
+                MP.AddModifier(regenModifier);
+                playerStatsController.UpdateHealthUI();
+
+                if (MP.Value >= MaxMP.Value) {
+                    RecalibrateStat(MP, MaxMP);
+                    Timing.PauseCoroutines(regenMPCourotine);
                 }
 
-                RecalibrateStat(stat,maxStat);
-                break;
+                
             }
-
-            yield return regenDelayTimer;
+            yield return Timing.WaitForSeconds(BaseMPRegenSpeed.Value);
         }
     }
 

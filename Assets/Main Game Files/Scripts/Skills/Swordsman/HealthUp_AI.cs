@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MEC;
 
 public class HealthUp_AI : MonoBehaviour {
     [Header("TODO: This is for testing only. Use network for this one")]
@@ -47,7 +48,7 @@ public class HealthUp_AI : MonoBehaviour {
         if (updateMainUI) {
             //TODO: As of now it only reflects on self need to check if on a party online
             playerStatsController.UpdateHealthUI();
-            playerStatsController.RegenHP();
+            Timing.ResumeCoroutines(playerStatsManager.GetSetHPCoroutine);
         }
 
         InitializeEffectDuration();

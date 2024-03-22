@@ -12,6 +12,7 @@ public class SkillBaseCast : MonoBehaviour {
     [SerializeField] private GameObject objectPoolManagerGO;
     [SerializeField] private GameObject damageUIManager;
     [SerializeField] private GameObject skillDurationWindow;
+    [SerializeField] private GameObject messageBoxManagerGO;
 
     [Header("UI Damage")]
     [SerializeField] private GameObject damageTextPrefab;
@@ -26,6 +27,7 @@ public class SkillBaseCast : MonoBehaviour {
     [SerializeField] private bool enableQuickSkillCancelDelay;
 
     private int skillID;
+    private bool isNormalAttacking;
     private bool enableCancellingSkill;
     private bool didCastSkill;
     private bool isCastingSkill;
@@ -40,6 +42,7 @@ public class SkillBaseCast : MonoBehaviour {
     private TagLookAtCamera tagLookAtCamera;
     private SkillReference skillReference;
     private ObjectPoolManager buffEffectPool;
+    private MessageBoxManager messageBoxManager;
 
     private Coroutine coroutineCancelDelay;
 
@@ -54,6 +57,7 @@ public class SkillBaseCast : MonoBehaviour {
     private HealthUp healthUp;
     private BerserkAura berserkAura;
     private SwordsBlessing swordsBlessing;
+    private SwordsmanNormalAttack swordsmanNormalAttack;
 
     #region GetSet Properties
     public int GetSetSkillID {
@@ -101,6 +105,11 @@ public class SkillBaseCast : MonoBehaviour {
         set { playerStatsManager = value; }
     }
 
+    public MessageBoxManager GetMessageBoxManager {
+        get { return messageBoxManager; }
+        set { messageBoxManager = value; }
+    }
+
     public bool GetSetDidCastSkill {
         get { return didCastSkill; }
         set { didCastSkill = value; }
@@ -125,6 +134,11 @@ public class SkillBaseCast : MonoBehaviour {
         get { return skillDurationWindow; }
         set { skillDurationWindow = value; }
     }
+
+    public bool GetSetIsNormalAttacking {
+        get { return isNormalAttacking; }
+        set { isNormalAttacking = value; }
+    }
     #endregion
 
     private void Awake() {
@@ -139,8 +153,10 @@ public class SkillBaseCast : MonoBehaviour {
         objectPoolManager = objectPoolManagerGO.GetComponent<ObjectPoolManager>();
         damageTextObjectPoolManager = damageUIManager.GetComponent<ObjectPoolManager>();
         tagLookAtCamera = damageUIManager.GetComponent<TagLookAtCamera>();
+        messageBoxManager = messageBoxManagerGO.GetComponent<MessageBoxManager>();
 
         /* Swordsman Skills */
+        swordsmanNormalAttack = swordsmanSkills.GetComponent<SwordsmanNormalAttack>();
         ice_Crack = swordsmanSkills.GetComponent<Ice_Crack>();
         lightningStrike = swordsmanSkills.GetComponent<LightningStrike>();
         groundImpact = swordsmanSkills.GetComponent<GroundImpact>();
@@ -157,6 +173,9 @@ public class SkillBaseCast : MonoBehaviour {
         skillID = _skillID;
 
         switch (skillID) {
+            case 0:
+                swordsmanNormalAttack.ActivateSkill();
+            break;
             case 1:
                 ice_Crack.ActivateSkill();
             break;

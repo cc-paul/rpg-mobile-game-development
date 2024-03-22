@@ -50,7 +50,10 @@ public class Global {
         Run_Sword,
         Walk_Sword,
         Walk_No_Sword,
-        Death_Sword
+        Death_Sword,
+        Sword_Normal_Attack_1,
+        Sword_Normal_Attack_2,
+        Sword_Normal_Attack_3
     }
 
     /* Swordsman Skills Animation */
@@ -154,11 +157,13 @@ public class Global {
     public const string TARGET_ATTACK = "Target Attack";
     public const string TARGET_HELP = "Target Help";
     public const string BUFF_EFFECT_POOL = "Buff Effect Pool";
+    public const string HITTING_AREA = "Hitting Area";
 
     /* File Names and Naming Declaration */
     public const string QUICK_SLOT_FILE = "QuickSlot_";
     public const string PREFS_SKILLNO_ = "Prefs_Skill_No_";
     public const string DURATION_ITEM = "Duration_Item";
+    public const string SWORD_NORMAN_ATTACK = "Sword_Normal_Attack_";
 
     /* Message */
     public const string MESSAGE_NO_MANA = "Unable to cast skill, no mana";
