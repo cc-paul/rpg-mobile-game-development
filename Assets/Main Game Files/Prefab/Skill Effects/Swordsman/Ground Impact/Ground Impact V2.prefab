@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1396911922095464036
 Transform:
   m_ObjectHideFlags: 0
@@ -242,6 +242,10 @@ PrefabInstance:
     - target: {fileID: 923535816719129143, guid: 445b7247b2af8384bb41f7df673300ff, type: 3}
       propertyPath: m_Name
       value: Glow Light
+      objectReference: {fileID: 0}
+    - target: {fileID: 923535816719129143, guid: 445b7247b2af8384bb41f7df673300ff, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 923535816719129143, guid: 445b7247b2af8384bb41f7df673300ff, type: 3}
       propertyPath: m_StaticEditorFlags

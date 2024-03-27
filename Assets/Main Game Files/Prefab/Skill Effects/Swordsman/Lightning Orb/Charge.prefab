@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6745765786674700648
 Transform:
   m_ObjectHideFlags: 0
@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 1
   useClipTransitionDuration: 0
+  runOnEnable: 0
 --- !u!1001 &506255253590545333
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -60,6 +61,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1111793306440779180, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1111793306440779180, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
       propertyPath: lengthInSec
       value: 2
       objectReference: {fileID: 0}
@@ -71,9 +76,17 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2293075236949240429, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3367314013316085171, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
       propertyPath: m_Name
       value: Charge slash blue
+      objectReference: {fileID: 0}
+    - target: {fileID: 3534217756811399166, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
+      propertyPath: prewarm
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3534217756811399166, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
       propertyPath: lengthInSec
@@ -132,8 +145,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5166316017537996253, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5166316017537996253, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
       propertyPath: lengthInSec
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5651989290075555383, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
+      propertyPath: prewarm
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8705658364109952277, guid: 8b20002c2b69a9d44ab5bae8e1d923cd, type: 3}
+      propertyPath: prewarm
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

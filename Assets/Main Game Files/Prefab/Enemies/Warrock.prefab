@@ -20423,7 +20423,7 @@ SkinnedMeshRenderer:
   m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
+  m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 3
   m_RayTraceProcedural: 0
@@ -36148,13 +36148,13 @@ LODGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5298251107295614904}
   serializedVersion: 2
-  m_LocalReferencePoint: {x: 0, y: 1.155707, z: 0.020146012}
-  m_Size: 1
+  m_LocalReferencePoint: {x: 0, y: 1.1557071, z: 0.020146132}
+  m_Size: 2
   m_FadeMode: 0
   m_AnimateCrossFading: 1
   m_LastLODIsBillboard: 0
   m_LODs:
-  - screenRelativeHeight: 0.03181874
+  - screenRelativeHeight: 0.1
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 3625427785126046537}
@@ -36282,6 +36282,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyModel: {fileID: 2236667374352402859}
+  explosionPrefab: {fileID: 4080865722045601702}
+  soulPrefab: {fileID: 5714201265909919466}
+  alivePrefab: {fileID: 3361093327357656099}
   enemyAnimation:
   - name: Enemy Idle
     animationName: 0
@@ -36319,15 +36322,14 @@ MonoBehaviour:
       _Speed: 1
       _NormalizedStartTime: NaN
     clipLength: 0
-  - name: Attack 1
+  - name: Enemy Attack 1
     animationName: 5
     clipTransition:
       _FadeDuration: 0.25
       _Events:
         _NormalizedTimes:
-        - 0.38129497
-        - 0.9655605
-        - NaN
+        - 0.4215827
+        - 1
         _Callbacks:
         - m_PersistentCalls:
             m_Calls:
@@ -36343,12 +36345,10 @@ MonoBehaviour:
                 m_StringArgument: 
                 m_BoolArgument: 0
               m_CallState: 2
-        - m_PersistentCalls:
-            m_Calls:
             - m_Target: {fileID: 1950461572641640077}
               m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: set_GetSetIsEnemyAttacking
-              m_Mode: 6
+              m_MethodName: ShowHitExplosion
+              m_Mode: 1
               m_Arguments:
                 m_ObjectArgument: {fileID: 0}
                 m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -36357,21 +36357,11 @@ MonoBehaviour:
                 m_StringArgument: 
                 m_BoolArgument: 0
               m_CallState: 2
+        - m_PersistentCalls:
+            m_Calls:
             - m_Target: {fileID: 1950461572641640077}
               m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: set_GetSetIsEnemyMoving
-              m_Mode: 6
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: GoToTarget
+              m_MethodName: TakeABreakFromAttacking
               m_Mode: 1
               m_Arguments:
                 m_ObjectArgument: {fileID: 0}
@@ -36379,39 +36369,22 @@ MonoBehaviour:
                 m_IntArgument: 0
                 m_FloatArgument: 0
                 m_StringArgument: 
-                m_BoolArgument: 1
+                m_BoolArgument: 0
               m_CallState: 2
         _Names:
-        - Deal Damage
-        - Attack Is Done
+        - Apply Damage and Hit
       _Clip: {fileID: 7400000, guid: 5d7bbcb233ca572468c45dd99cb98686, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
     clipLength: 0
-  - name: Attack 2
-    animationName: 6
+  - name: Enemy Idle Attack
+    animationName: 9
     clipTransition:
       _FadeDuration: 0.25
       _Events:
         _NormalizedTimes:
-        - 0.5412756
-        - 0.9667338
-        - NaN
+        - 1
         _Callbacks:
-        - m_PersistentCalls:
-            m_Calls:
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: DealDamage
-              m_Mode: 1
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 0
-              m_CallState: 2
         - m_PersistentCalls:
             m_Calls:
             - m_Target: {fileID: 1950461572641640077}
@@ -36428,50 +36401,7 @@ MonoBehaviour:
               m_CallState: 2
             - m_Target: {fileID: 1950461572641640077}
               m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: set_GetSetIsEnemyMoving
-              m_Mode: 6
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: GoToTarget
-              m_Mode: 1
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
-        _Names:
-        - Deal Damage
-        - Attack Is Done
-      _Clip: {fileID: 7400000, guid: ae11252bbe6db254ea23bee578e3ea96, type: 2}
-      _Speed: 1
-      _NormalizedStartTime: NaN
-    clipLength: 0
-  - name: Attack 3
-    animationName: 7
-    clipTransition:
-      _FadeDuration: 0.25
-      _Events:
-        _NormalizedTimes:
-        - 0.5356056
-        - 0.90571046
-        - NaN
-        _Callbacks:
-        - m_PersistentCalls:
-            m_Calls:
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: DealDamage
+              m_MethodName: DoAITask
               m_Mode: 1
               m_Arguments:
                 m_ObjectArgument: {fileID: 0}
@@ -36481,59 +36411,18 @@ MonoBehaviour:
                 m_StringArgument: 
                 m_BoolArgument: 0
               m_CallState: 2
-        - m_PersistentCalls:
-            m_Calls:
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: set_GetSetIsEnemyAttacking
-              m_Mode: 6
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 0
-              m_CallState: 2
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: set_GetSetIsEnemyMoving
-              m_Mode: 6
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: GoToTarget
-              m_Mode: 1
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
-        _Names:
-        - Deal Damage
-        - Attack Is Done
-      _Clip: {fileID: 7400000, guid: 9ca71be469a00ee48b47a42037fc41c6, type: 2}
-      _Speed: 1
+        _Names: []
+      _Clip: {fileID: 7400000, guid: d16fb7916be601248a684a9338fcc209, type: 2}
+      _Speed: 2
       _NormalizedStartTime: NaN
     clipLength: 0
-  - name: Enemy Death
+  - name: Dead
     animationName: 4
     clipTransition:
       _FadeDuration: 0.25
       _Events:
         _NormalizedTimes:
-        - 0.90571046
-        - NaN
+        - 1
         _Callbacks:
         - m_PersistentCalls:
             m_Calls:
@@ -36551,19 +36440,7 @@ MonoBehaviour:
               m_CallState: 2
             - m_Target: {fileID: 1950461572641640077}
               m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: set_GetSetIsEnemyMoving
-              m_Mode: 6
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: 
-                m_BoolArgument: 1
-              m_CallState: 2
-            - m_Target: {fileID: 1950461572641640077}
-              m_TargetAssemblyTypeName: EnemyAI, Assembly-CSharp
-              m_MethodName: GoToTarget
+              m_MethodName: DoAITask
               m_Mode: 1
               m_Arguments:
                 m_ObjectArgument: {fileID: 0}
@@ -36571,21 +36448,21 @@ MonoBehaviour:
                 m_IntArgument: 0
                 m_FloatArgument: 0
                 m_StringArgument: 
-                m_BoolArgument: 1
+                m_BoolArgument: 0
               m_CallState: 2
-        _Names:
-        - Attack Is Done
+        _Names: []
       _Clip: {fileID: 7400000, guid: 0f323d127880aa74d8bd24a60e4fa0aa, type: 2}
       _Speed: 1
       _NormalizedStartTime: NaN
     clipLength: 0
-  distanceToAttackMelee: 2
-  distanceToAttackRange: 6
-  agressiveDistance: 7.32
+  patrolStopingDistance: 0.5
   addedSpeed: 2
-  isEnemyRange: 0
-  isEnemyAgressive: 1
-  attackEndRange: 3
+  distanceToAttackRange: 7
+  distanceToAttackMelee: 1.5
+  distanceToLetGo: 15
+  agressiveDistance: 0
+  isEnemyAgressive: 0
+  attackIndexRange: 1
   layersToAttack:
   - serializedVersion: 2
     m_Bits: 8
@@ -47724,7 +47601,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1398263219336327814
 Transform:
   m_ObjectHideFlags: 0
@@ -47742,6 +47619,9 @@ Transform:
   - {fileID: 299791972189604516}
   - {fileID: 5637483230316406487}
   - {fileID: 5833022287048224326}
+  - {fileID: 3287760403671597623}
+  - {fileID: 49508751070753169}
+  - {fileID: 3456927682797579670}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &96921782159259493
@@ -52909,3 +52789,213 @@ Transform:
   - {fileID: 178876913641100588}
   m_Father: {fileID: 7654881144398741292}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &5264753122593024091
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1398263219336327814}
+    m_Modifications:
+    - target: {fileID: 458455480087135921, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_Name
+      value: Soul
+      objectReference: {fileID: 0}
+    - target: {fileID: 458455480087135921, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+--- !u!4 &3287760403671597623 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7255388853651499628, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+  m_PrefabInstance: {fileID: 5264753122593024091}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5714201265909919466 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 458455480087135921, guid: d2797f374b322f14ebf8d9b9a449434e, type: 3}
+  m_PrefabInstance: {fileID: 5264753122593024091}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7471992017925304200
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1398263219336327814}
+    m_Modifications:
+    - target: {fileID: 6851097524315715630, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_Name
+      value: Stones Hit
+      objectReference: {fileID: 0}
+    - target: {fileID: 6851097524315715630, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 5765257494813641769, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+--- !u!4 &49508751070753169 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7430441119699541529, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+  m_PrefabInstance: {fileID: 7471992017925304200}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4080865722045601702 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6851097524315715630, guid: 7e4150fe5fceb58498b2806c58225c9c, type: 3}
+  m_PrefabInstance: {fileID: 7471992017925304200}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7698706540276210886
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1398263219336327814}
+    m_Modifications:
+    - target: {fileID: 4932088507883938021, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_Name
+      value: Resurrect
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+--- !u!1 &3361093327357656099 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4932088507883938021, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+  m_PrefabInstance: {fileID: 7698706540276210886}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3456927682797579670 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4984980826245493072, guid: ef9a08cac7729344698554e3fcd08ffe, type: 3}
+  m_PrefabInstance: {fileID: 7698706540276210886}
+  m_PrefabAsset: {fileID: 0}

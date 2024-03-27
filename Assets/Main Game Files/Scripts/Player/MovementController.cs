@@ -201,13 +201,17 @@ public class MovementController : MonoBehaviour {
     [SerializeField] private Image imgRun;
     [SerializeField] private Image imgWalk;
 
+    [Space(2)]
+
+    [Header("Components")]
+    [SerializeField] private CameraControl cameraControl;
+
     private CharacterController characterController;
     private PlayerStatsManager playerStatsManager;
     private BasicAnimation basicAnimation;
     private TargetPositioning skillTargetPositioning;
     private SkillBaseCast skillBaseCast;
 
-    private WaitForSeconds movementNullWait = new WaitForSeconds(0f);
     private Vector2 input;
     private Vector2 inputDir;
     private Vector3 velocity;
@@ -254,6 +258,7 @@ public class MovementController : MonoBehaviour {
         basicAddedSpeed = new StatModifier(4, Global.StatModType.Flat, this);
 
         SetupRunAndWalkButton();
+        playerMovementCourotine = Timing.RunCoroutine(PlayerStartMoving());
     }
 
     private void OnEnable() {
@@ -271,14 +276,7 @@ public class MovementController : MonoBehaviour {
     }
 
     public void InitiatePlayerMovement() {
-        /*if (playerMovementCourotine == null) {
-            playerMovementCourotine = StartCoroutine(nameof(PlayerStartMoving));
-        }*/
-
-        if (!isMovementJSInit) {
-            isMovementJSInit = true;
-            playerMovementCourotine = Timing.RunCoroutine(PlayerStartMoving());
-        }
+        Timing.ResumeCoroutines(playerMovementCourotine);
     }
 
     private IEnumerator<float> PlayerStartMoving() {
@@ -288,60 +286,56 @@ public class MovementController : MonoBehaviour {
                 movementJoystick.Vertical
             );
 
+
             inputDir = input.normalized;
 
             if ((
                 skillBaseCast.GetSetIsCastingSkill && !skillBaseCast.GetSetEnableCancelingSkill) ||
                 playerStatsManager.GetSetIsPlayerDead
             ) {
-                isMovementJSInit = false;
-                Timing.PauseCoroutines(playerMovementCourotine);
-                break;
+                inputDir = Vector2.zero;
             }
 
 
             if (inputDir == Vector2.zero) {
-                basicAnimation.PlayBasicAnimation(_animationCategory: Global.AnimationCategory.Idle);
-                skillTargetPositioning.RepositionTargetIndicator();
+                if (!skillBaseCast.GetSetIsCastingSkill) {
+                    basicAnimation.PlayBasicAnimation(_animationCategory: Global.AnimationCategory.Idle);
+                    skillTargetPositioning.RepositionTargetIndicator();
 
-                isMovementJSInit = false;
-                Timing.PauseCoroutines(playerMovementCourotine);
-                break;
+                    Timing.PauseCoroutines(playerMovementCourotine);
+                }
+            } else {
+                ySpeed += Physics.gravity.y * Time.deltaTime;
+
+                targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraTransform.eulerAngles.y;
+
+                controllerTransform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(
+                    controllerTransform.eulerAngles.y,
+                    targetRotation, ref turnSmoothVelocity,
+                    turnSmoothTime
+                );
+
+                targetSpeed = playerStatsManager.Speed.Value * inputDir.magnitude;
+                currentSpeed = Mathf.SmoothDamp(
+                    currentSpeed,
+                    targetSpeed,
+                    ref speedSmoothVelocity,
+                    speedSmoothTime
+                );
+
+                velocity = controllerTransform.forward * currentSpeed;
+                velocity = AdjustVelocityToSlope(_velocity: velocity);
+                velocity.y += ySpeed + 1f;
+
+                characterController.Move(velocity * Time.deltaTime);
+                basicAnimation.PlayBasicAnimation(_animationCategory: isRunning ? Global.AnimationCategory.Run : Global.AnimationCategory.Walk);
+                skillBaseCast.GetSetIsCastingSkill = false;
+                skillTargetPositioning.RepositionTargetIndicator();
+                cameraControl.StartControllingTheCamera();
             }
 
-            ySpeed += Physics.gravity.y * Time.deltaTime;
-
-            targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraTransform.eulerAngles.y;
-
-            controllerTransform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(
-                controllerTransform.eulerAngles.y,
-                targetRotation, ref turnSmoothVelocity,
-                turnSmoothTime
-            );
-
-            targetSpeed = playerStatsManager.Speed.Value * inputDir.magnitude;
-            currentSpeed = Mathf.SmoothDamp(
-                currentSpeed,
-                targetSpeed,
-                ref speedSmoothVelocity,
-                speedSmoothTime
-            );
-
-            velocity = controllerTransform.forward * currentSpeed;
-            velocity = AdjustVelocityToSlope(_velocity: velocity);
-            velocity.y += ySpeed + 1f;
-
-            characterController.Move(velocity * Time.deltaTime);
-            basicAnimation.PlayBasicAnimation(_animationCategory: isRunning ? Global.AnimationCategory.Run : Global.AnimationCategory.Walk);
-            skillBaseCast.GetSetIsCastingSkill = false;
-            skillTargetPositioning.RepositionTargetIndicator();
-
-            //yield return movementNullWait;
             yield return Timing.WaitForSeconds(0f);
         }
-
-        isMovementJSInit = false;
-        Timing.PauseCoroutines(playerMovementCourotine);
     }
 
     private Vector3 AdjustVelocityToSlope(Vector3 _velocity) {

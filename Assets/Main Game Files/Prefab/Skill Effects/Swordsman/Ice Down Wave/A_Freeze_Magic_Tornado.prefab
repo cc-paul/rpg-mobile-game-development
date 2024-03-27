@@ -4856,8 +4856,8 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 0
-  looping: 0
-  prewarm: 0
+  looping: 1
+  prewarm: 1
   playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
@@ -9589,7 +9589,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1119194294061263629
 Transform:
   m_ObjectHideFlags: 0
@@ -9631,8 +9631,8 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 0
-  looping: 0
-  prewarm: 0
+  looping: 1
+  prewarm: 1
   playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
@@ -14338,6 +14338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 3
   useClipTransitionDuration: 0
+  runOnEnable: 0
 --- !u!1 &1529042629688987939
 GameObject:
   m_ObjectHideFlags: 0
