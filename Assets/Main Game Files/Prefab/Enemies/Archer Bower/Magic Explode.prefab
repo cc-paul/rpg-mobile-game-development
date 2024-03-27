@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7696260288067514543}
   - component: {fileID: 3308038109893126887}
   - component: {fileID: 4984723225132477342}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Petals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4918,7 +4918,7 @@ GameObject:
   - component: {fileID: 9174999365433492704}
   - component: {fileID: 6161507711665320492}
   - component: {fileID: 4324613886292865038}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Sparks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9826,7 +9826,7 @@ GameObject:
   - component: {fileID: 3170424990821042038}
   - component: {fileID: 1602006716397504698}
   - component: {fileID: 4459842435047307437}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Magic Explode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14850,7 +14850,7 @@ GameObject:
   - component: {fileID: 5722403238855878269}
   - component: {fileID: 1225498762759166564}
   - component: {fileID: 2737831440895794876}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Flash
   m_TagString: Untagged
   m_Icon: {fileID: 0}

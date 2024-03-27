@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using MEC;
+using System.Collections.Generic;
 
 public class CameraControl : MonoBehaviour {
     [Header("Zoom Buttons")]
@@ -77,6 +79,7 @@ public class CameraControl : MonoBehaviour {
     private void Awake() {
         cameraTransform = transform;
         UpdateTarget(target);
+        StartControllingTheCamera();
 
         zoomInButton.onClick.AddListener(ZoomIn);
         zoomOutButton.onClick.AddListener(ZoomOut);
@@ -88,7 +91,7 @@ public class CameraControl : MonoBehaviour {
         cameraTransform.localEulerAngles = new Vector3(currentX, -currentY, 0);
     }
 
-    private void LateUpdate() {
+    /*private void LateUpdate() {
         if (target == null) return;
 
         #if !UNITY_EDITOR
@@ -102,7 +105,22 @@ public class CameraControl : MonoBehaviour {
 
         cameraTransform.rotation = rotation;
         cameraTransform.position = position;
+    }*/
+
+    public void StartControllingTheCamera() {
+        #if !UNITY_EDITOR
+            HandleTouch();
+        #else
+            HandleMouse();
+        #endif
+
+        rotation = Quaternion.Euler(currentY, currentX, 0);
+        position = rotation * new Vector3(0f, 0f, -distanceFromTarget - currentFOV) + target.position + offset;
+
+        cameraTransform.rotation = rotation;
+        cameraTransform.position = position;
     }
+
 
     private void HandleTouch() {
         if (!isPressed) return;
@@ -176,10 +194,12 @@ public class CameraControl : MonoBehaviour {
     private void ZoomIn() {
         currentFOV -= zoomSpeed;
         currentFOV = Mathf.Clamp(currentFOV, maxFOV, minFOV);
+        StartControllingTheCamera();
     }
 
     private void ZoomOut() {
         currentFOV += zoomSpeed;
         currentFOV = Mathf.Clamp(currentFOV, maxFOV, minFOV);
+        StartControllingTheCamera();
     }
 }

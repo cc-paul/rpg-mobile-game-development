@@ -8,6 +8,428 @@ using MEC;
 public class EnemyAI : MonoBehaviour {
     [Header("Game Object and Others")]
     [SerializeField] private GameObject enemyModel;
+    [SerializeField] private GameObject explosionPrefab;
+    [SerializeField] private GameObject soulPrefab;
+    [SerializeField] private GameObject alivePrefab;
+
+    [Space(2)]
+
+    [Header("Enemy Animations")]
+    [SerializeField] private List<AnimationClipInfo<Global.EnemyAnimation>> enemyAnimation = new List<AnimationClipInfo<Global.EnemyAnimation>>();
+
+    [Space(2)]
+
+    [Header("AI Settings")]
+    [SerializeField] private float patrolStopingDistance;
+    [SerializeField] private float addedSpeed;
+    [SerializeField] private float distanceToAttackRange;
+    [SerializeField] private float distanceToAttackMelee;
+    [SerializeField] private float distanceToLetGo;
+    [SerializeField] private float agressiveDistance;
+    [SerializeField] private bool isEnemyAgressive;
+    [SerializeField] private int attackIndexRange;
+
+    [Space(2)]
+
+    [Header("Layer Mask")]
+    [SerializeField] private List<LayerMask> layersToAttack = new List<LayerMask>();
+
+    private string currentAnimationName;
+    private string attackName;
+    private int patrolIndex;
+    private int timeToMove;
+    private int attackNumber;
+    private float attackRange;
+    private float targetDistance;
+    private float enemyDamage;
+    private bool isEnemyRange;
+    private bool isEnemyAttacking;
+    private bool isEnemyHasHit;
+    private bool isPlayerInsideSphere;
+
+    private Global.EnemyAnimation rowAnimationName;
+    private ClipTransition rowClipTransition;
+    private GameObject enemyParentContainer;
+    private List<Vector3> patrolPositions = new List<Vector3>();
+    private Vector3 currentDestination;
+    private Vector3 lookDirection;
+    private Collider[] colliders;
+
+    /* Attacker Data */
+    private GameObject attackerController;
+    private GameObject attackerController_Temp;
+    private GameObject attackerGeneralSettings;
+    private GameObject attackerGeneralSettings_Temp;
+    private PlayerStatsController attackerStatsController;
+    private PlayerStatsController attackerStatsController_Temp;
+    private PlayerStatsManager attackerStatsManager;
+    private PlayerStatsManager attackerStatsManager_Temp;
+
+    /* Current Enemy Component */
+    private EnemyStatsManager enemyStatsManager;
+    private EnemyUIController enemyUIController;
+    private NavMeshAgent enemyAgent;
+    private AnimancerComponent animancerComponent;
+    private BoxCollider enemyBoxCollider;
+
+    /* Components */
+
+    private StatModifier damageTaken;
+    private StatModifier addedChaseSpeed;
+
+    #region GetSet Properties
+    public GameObject GetSetEnemyParentContainer {
+        get { return enemyParentContainer;}
+        set { enemyParentContainer = value;}
+    }
+
+    public List<Vector3> GetSetPatrolPositions {
+        get { return patrolPositions; }
+        set { patrolPositions = value; }
+    }
+
+    public GameObject GetSetAttackerController {
+        get { return attackerController; }
+        set { attackerController = value; }
+    }
+
+    public bool GetSetIsEnemyRange {
+        get { return isEnemyRange; }
+        set { isEnemyRange = value; }
+    }
+
+    public bool GetSetIsEnemyAttacking {
+        get { return isEnemyAttacking; }
+        set { isEnemyAttacking = value; }
+    }
+
+    public bool GetSetIsEnemyAgressive {
+        get { return isEnemyAgressive; }
+        set { isEnemyAgressive = value; }
+    }
+    #endregion
+
+    private void Awake() {
+        OptionalWarning.NativeControllerHumanoid.Disable();
+
+        enemyParentContainer = transform.parent.gameObject;
+        animancerComponent = enemyModel.GetComponent<AnimancerComponent>();
+        enemyUIController = GetComponent<EnemyUIController>();
+        enemyStatsManager = GetComponent<EnemyStatsManager>();
+        enemyAgent = enemyParentContainer.GetComponent<NavMeshAgent>();
+        enemyBoxCollider = enemyParentContainer.GetComponent<BoxCollider>();
+
+        attackIndexRange = attackIndexRange + 1;
+    }
+
+    public void AddDefaulStats() {
+        enemyStatsManager.AddDefaultStats();
+        enemyBoxCollider.enabled = true;
+
+        enemyUIController.UpdateHealthUI(
+            _currentHP: enemyStatsManager.Health.Value,
+            _maxHP: enemyStatsManager.MaxHealth.Value
+        );
+
+        Timing.RunCoroutine(ShowAlive());
+    }
+
+    public void SetNavigationDefaultStats() {
+        attackRange = isEnemyRange ? distanceToAttackRange : distanceToAttackMelee;
+        enemyAgent.stoppingDistance = attackerController == null ? attackRange : patrolStopingDistance;
+        enemyAgent.radius = attackerController == null ? attackRange : patrolStopingDistance;
+        enemyAgent.speed = enemyStatsManager.Speed.Value;
+        enemyAgent.isStopped = false;
+    }
+
+    private void AddBoostingStats() {
+        addedChaseSpeed = new StatModifier(addedSpeed, Global.StatModType.Flat, this);
+        enemyStatsManager.Speed.AddModifier(addedChaseSpeed);
+    }
+
+    public void EnemyTakeDamage(
+        PlayerStatsManager playerStatsManager,
+        PlayerStatsController playerStatsController,
+        float damage
+    ) {
+        damageTaken = new StatModifier(-damage, Global.StatModType.Flat, this);
+        enemyStatsManager.Health.AddModifier(damageTaken);
+
+        enemyUIController.UpdateHealthUI(
+            _currentHP: enemyStatsManager.Health.Value,
+            _maxHP: enemyStatsManager.MaxHealth.Value
+        );
+
+        enemyStatsManager.GetSetHPCoroutine = Timing.RunCoroutine(enemyStatsManager.RegenStatCoroutine(
+            enemyStatsManager.Health,
+            enemyStatsManager.MaxHealth,
+            enemyStatsManager.HealthRegenValue
+        ));
+
+        if (enemyStatsManager.Health.Value <= 0) {
+            EnemyIsDead();
+        } else {
+            if (attackerController == null && playerStatsManager.GetSetCurrentMobsFollowingMe.Count < playerStatsManager.GetSetMaxTargetToLure) {
+                attackerController = playerStatsManager.transform.parent.transform.Find(Global.CONTROLLER).gameObject;
+                attackerStatsController = playerStatsController;
+                attackerStatsManager = playerStatsManager;
+
+                if (!attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+                    attackerStatsManager.GetSetCurrentMobsFollowingMe.Add(enemyParentContainer);
+                }
+
+                isEnemyHasHit = true;
+                currentDestination = attackerController.transform.position;
+                enemyAgent.isStopped = true;
+                AddBoostingStats();
+                SetNavigationDefaultStats();
+                LookAtTarget();
+                DoAITask();
+            }
+        }
+    }
+
+    public void DoAITask() {
+        if (enemyStatsManager.Health.Value > 0) {
+            if (attackerController == null) {
+
+                if (isEnemyAgressive) {
+                    CheckNearbyPlayer();
+                }
+
+                if (currentDestination == Vector3.zero) {
+                    currentDestination = patrolPositions[0];
+                } else {
+                    if (enemyAgent.remainingDistance <= enemyAgent.stoppingDistance) {
+                        timeToMove = Random.Range(1, 5);
+                        enemyAgent.isStopped = true;
+
+                        if (patrolIndex < patrolPositions.Count - 1) {
+                            patrolIndex++;
+                        } else {
+                            patrolIndex = 0;
+                        }
+
+                        currentDestination = patrolPositions[patrolIndex];
+                        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle.ToString());
+                    }
+                }
+
+                Invoke(nameof(GoToPatrolArea), timeToMove);
+            } else {
+                currentDestination = attackerController.transform.position;
+                targetDistance = Vector3.Distance(currentDestination, enemyParentContainer.transform.position);
+                enemyAgent.isStopped = isEnemyAttacking;
+                enemyAgent.SetDestination(attackerController.transform.position);
+
+                if (isEnemyHasHit) {
+                    isEnemyHasHit = false;
+                    enemyAgent.isStopped = false;
+                    GoToTarget();
+                    LookAtTarget();
+                } else {
+                    if (targetDistance <= attackRange) {
+                        enemyAgent.isStopped = true;
+                        isEnemyAttacking = true;
+                        currentAnimationName = "";
+
+                        LookAtTarget();
+                        AttackTheAttacker();
+                    } else if (targetDistance > attackRange && targetDistance < distanceToLetGo) {
+                        isEnemyAttacking = false;
+                        GoToTarget();
+                    } else {
+                        currentDestination = patrolPositions[0];
+
+                        ResetAttackerDetails();
+                        enemyStatsManager.Speed.ResetModifiers();
+                        SetNavigationDefaultStats();
+                        GoToPatrolArea();
+                    }
+                }
+            }
+        }
+    }
+
+    public void AttackTheAttacker() {
+        enemyAgent.isStopped = true;
+        attackNumber = Random.Range(1, attackIndexRange);
+        attackName = $"Attack{attackNumber}_Animation";
+        currentAnimationName = "";
+
+        PlayEnemyAnimation(_currentAnimationName: attackName);
+    }
+
+    private void GoToPatrolArea() {
+        if (enemyStatsManager.Health.Value <= 0) return;
+
+        enemyAgent.isStopped = false;
+        enemyAgent.SetDestination(currentDestination);
+        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Walk.ToString());
+    }
+
+    public void GoToTarget() {
+        if (enemyStatsManager.Health.Value <= 0) return;
+
+        enemyAgent.isStopped = false;
+        enemyAgent.SetDestination(currentDestination);
+        PlayEnemyAnimation(_currentAnimationName: attackerController == null ? Global.EnemyAnimation.Enemy_Walk.ToString() : Global.EnemyAnimation.Enemy_Chase.ToString());
+    }
+
+    private void LookAtTarget() {
+        lookDirection = new Vector3(currentDestination.x, enemyParentContainer.transform.position.y, currentDestination.z);
+        enemyParentContainer.transform.LookAt(lookDirection);
+    }
+
+    public void TakeABreakFromAttacking() {
+        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Idle_Attack.ToString());
+    }
+
+    private void EnemyIsDead() {
+        if (attackerController != null) {
+            ResetAttackerDetails();
+        }
+
+        currentDestination = Vector3.zero;
+        patrolIndex = 0;
+        timeToMove = 0;
+        attackerController = null;
+        isEnemyAttacking = false;
+        isEnemyHasHit = false;
+        enemyAgent.isStopped = true;
+        enemyBoxCollider.enabled = false;
+        currentAnimationName = "";
+        PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Death.ToString());
+        Timing.RunCoroutine(HideBody());
+    }
+
+    public void RecalibrateSettings() {
+        if (attackerController != null) {
+            ResetAttackerDetails();
+        }
+        
+        currentAnimationName = "";
+        currentDestination = Vector3.zero;
+        patrolIndex = 0;
+        timeToMove = 0;
+        isEnemyAttacking = false;
+        isEnemyHasHit = false;
+        enemyAgent.isStopped = false;
+        enemyBoxCollider.enabled = true;
+        attackerController = null;
+    }
+
+    private IEnumerator<float> ShowAlive() {
+        alivePrefab.SetActive(true);
+
+        yield return Timing.WaitForSeconds(1f);
+        alivePrefab.SetActive(false);
+    }
+
+    private IEnumerator<float> HideBody() {
+        soulPrefab.SetActive(true);
+
+        yield return Timing.WaitForSeconds(5f);
+        enemyParentContainer.SetActive(false);
+        soulPrefab.SetActive(false);
+    }
+
+    private void ResetAttackerDetails() {
+        if (attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+            attackerStatsManager.GetSetCurrentMobsFollowingMe.Remove(enemyParentContainer);
+        }
+
+        attackerController = null;
+        attackerStatsController = null;
+        attackerStatsManager = null;
+    }
+
+    public void ShowHitExplosion() {
+        explosionPrefab.transform.position = attackerController.transform.Find(Global.HITTING_AREA).transform.position;
+        explosionPrefab.SetActive(true);
+
+        Invoke(nameof(HideExplosion), 0.5f);
+    }
+
+    private void HideExplosion() {
+        explosionPrefab.SetActive(false);
+        explosionPrefab.transform.position = Vector3.zero;
+    }
+
+    public void DealDamage() {
+        enemyDamage = enemyStatsManager.BaseDamage.Value;
+
+        attackerStatsController.ReceiveDamage(_damageAmount: enemyDamage, _sourceComponent: this);
+    }
+
+    public void CheckIfEnemyHasATarget() {
+        if (attackerController != null) {
+            DoAITask();
+        } else {
+            Debug.Log(attackerController);
+        }
+    }
+
+    public void CheckNearbyPlayer() {
+        for (int layer_i = 0; layer_i < layersToAttack.Count; layer_i++) {
+            isPlayerInsideSphere = Physics.CheckSphere(enemyParentContainer.transform.position, agressiveDistance, layersToAttack[layer_i]);
+
+            if (isPlayerInsideSphere) {
+                colliders = Physics.OverlapSphere(enemyParentContainer.transform.position, agressiveDistance, layersToAttack[layer_i]);
+
+                if (colliders.Length > 0) {
+                    attackerController_Temp = colliders[0].transform.parent.transform.Find(Global.CONTROLLER).gameObject;
+                    attackerGeneralSettings_Temp = colliders[0].transform.parent.transform.Find(Global.GENERAL_SETTINGS).gameObject;
+                    attackerStatsManager_Temp = attackerGeneralSettings_Temp.GetComponent<PlayerStatsManager>();
+                    attackerStatsController_Temp = attackerGeneralSettings_Temp.GetComponent<PlayerStatsController>();
+
+                    if (attackerController == null && attackerStatsManager_Temp.GetSetCurrentMobsFollowingMe.Count < attackerStatsManager_Temp.GetSetMaxTargetToLure) {
+                        attackerController = attackerController_Temp;
+                        attackerStatsController = attackerStatsController_Temp;
+                        attackerStatsManager = attackerStatsManager_Temp;
+
+                        if (!attackerStatsManager.GetSetCurrentMobsFollowingMe.Contains(enemyParentContainer)) {
+                            attackerStatsManager.GetSetCurrentMobsFollowingMe.Add(enemyParentContainer);
+                        }
+
+                        AddBoostingStats();
+                        SetNavigationDefaultStats();
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    private void OnDrawGizmosSelected() {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, agressiveDistance);
+    }
+
+
+    #region Animation Player
+    public void PlayEnemyAnimation(string _currentAnimationName) {
+        if (currentAnimationName == _currentAnimationName) return;
+        currentAnimationName = _currentAnimationName;
+
+        for (int animation_i = 0; animation_i < enemyAnimation.Count; animation_i++) {
+            rowAnimationName = enemyAnimation[animation_i].animationName;
+
+            if (rowAnimationName.ToString() == _currentAnimationName) {
+                rowClipTransition = enemyAnimation[animation_i].clipTransition;
+
+                animancerComponent.Play(rowClipTransition);
+                currentAnimationName = rowAnimationName.ToString();
+                break;
+            }
+        }
+    }
+    #endregion
+}
+/*
+public class EnemyAI : MonoBehaviour {
+    [Header("Game Object and Others")]
+    [SerializeField] private GameObject enemyModel;
     [SerializeField] private GameObject castingAreaForRange;
     [SerializeField] private GameObject weaponToShoot;
     [SerializeField] private GameObject hitPrefab;
@@ -59,7 +481,7 @@ public class EnemyAI : MonoBehaviour {
     private BoxCollider enemyBoxCollider;
     private EnemyProjectile enemyProjectile;
 
-    /* Attacker Data */
+    *//* Attacker Data *//*
     private GameObject attackerGeneralSettings;
     private GameObject attackerController;
     private GameObject attackerController_Temp;
@@ -143,7 +565,7 @@ public class EnemyAI : MonoBehaviour {
     }
 
     private void AddBoostingStats() {
-        addedChaseSpeed = new StatModifier(addedSpeed,Global.StatModType.Flat,this);
+        addedChaseSpeed = new StatModifier(addedSpeed, Global.StatModType.Flat, this);
         enemyStatsManager.Speed.AddModifier(addedChaseSpeed);
         SetNavigationDefaultStats();
     }
@@ -204,7 +626,6 @@ public class EnemyAI : MonoBehaviour {
         isEnemyMoving = false;
         isEnemyAttacking = false;
         enemyBoxCollider.enabled = false;
-        enemyStatsManager.GetSetIsRegenPaused = true;
         enemyStatsManager.Speed.RemoveModifier(addedChaseSpeed);
 
         if (attackerController != null) {
@@ -216,7 +637,7 @@ public class EnemyAI : MonoBehaviour {
         Timing.PauseCoroutines(enemyStatsManager.GetSetHPCoroutine);
         PlayEnemyAnimation(_currentAnimationName: Global.EnemyAnimation.Enemy_Death.ToString());
 
-        Invoke(nameof(DisableEnemy),4f);
+        Invoke(nameof(DisableEnemy), 4f);
     }
 
     public void DisableEnemy() {
@@ -236,15 +657,11 @@ public class EnemyAI : MonoBehaviour {
             _maxHP: enemyStatsManager.MaxHealth.Value
         );
 
-        if (enemyStatsManager.GetSetIsRegenPaused) {
-            enemyStatsManager.GetSetIsRegenPaused = false;
-
-            enemyStatsManager.GetSetHPCoroutine = Timing.RunCoroutine(enemyStatsManager.RegenStatCoroutine(
-                enemyStatsManager.Health,
-                enemyStatsManager.MaxHealth,
-                enemyStatsManager.HealthRegenValue
-            ));
-        }
+        enemyStatsManager.GetSetHPCoroutine = Timing.RunCoroutine(enemyStatsManager.RegenStatCoroutine(
+            enemyStatsManager.Health,
+            enemyStatsManager.MaxHealth,
+            enemyStatsManager.HealthRegenValue
+        ));
 
         if (attackerController == null && playerStatsManager.GetSetCurrentMobsFollowingMe.Count < playerStatsManager.GetSetMaxTargetToLure) {
             if (enemyStatsManager.Health.Value <= 0) {
@@ -289,7 +706,7 @@ public class EnemyAI : MonoBehaviour {
         hitPrefab.transform.position = attackerController.transform.Find(Global.HITTING_AREA).transform.position;
         hitPrefab.SetActive(true);
 
-        Invoke(nameof(HideExplosion),0.5f);
+        Invoke(nameof(HideExplosion), 0.5f);
     }
 
     private void HideExplosion() {
@@ -300,7 +717,7 @@ public class EnemyAI : MonoBehaviour {
     public void DealDamage() {
         enemyDamage = enemyStatsManager.BaseDamage.Value;
 
-        attackerStatsController.ReceiveDamage(_damageAmount: enemyDamage,_sourceComponent: this);
+        attackerStatsController.ReceiveDamage(_damageAmount: enemyDamage, _sourceComponent: this);
     }
 
     public void CheckNearbyPlayer() {
@@ -333,11 +750,11 @@ public class EnemyAI : MonoBehaviour {
         }
     }
 
-    /*void OnDrawGizmosSelected() {
+    *//*void OnDrawGizmosSelected() {
         // Draw the sphere cast for visualization in the editor
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, agressiveDistance);
-    }*/
+    }*//*
 
     #region Animation Player
     public void PlayEnemyAnimation(string _currentAnimationName) {
@@ -361,7 +778,7 @@ public class EnemyAI : MonoBehaviour {
         }
     }
     #endregion
-}
+}*/
 
 /*public class EnemyAI : MonoBehaviour {
     [Header("Game Object and Others")]

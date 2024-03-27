@@ -111,7 +111,8 @@ public class Global {
         Attack1_Animation,
         Attack2_Animation,
         Attack3_Animation,
-        Enemy_Chase
+        Enemy_Chase,
+        Enemy_Idle_Attack
     }
 
     /* Regen Category */

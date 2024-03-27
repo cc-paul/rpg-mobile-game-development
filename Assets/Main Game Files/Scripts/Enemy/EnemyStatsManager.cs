@@ -23,8 +23,10 @@ public class EnemyStatsManager : MonoBehaviour {
     private EnemyUIController enemyUIController;
     private EnemyAI enemyAI;
     private CoroutineHandle regenHPCourotine;
+    private StatModifier regenModifier;
+    private StatModifier deductModifier;
     private bool isEnemyDead;
-    private bool isRegenPaused = true;
+    private float difference;
 
 
     #region GetSet Properties
@@ -37,12 +39,6 @@ public class EnemyStatsManager : MonoBehaviour {
         get { return isEnemyDead; }
         set { isEnemyDead = value; }
     }
-
-    public bool GetSetIsRegenPaused {
-        get { return isRegenPaused; }
-        set { isRegenPaused = value; }
-    }
-
    
     #endregion
 
@@ -52,6 +48,9 @@ public class EnemyStatsManager : MonoBehaviour {
     }
 
     public void AddDefaultStats() {
+        Health.ResetModifiers();
+        Speed.ResetModifiers();
+
         Speed.BaseValue = defaultSpeed;
         Health.BaseValue = defaultHealth;
         MaxHealth.BaseValue = Health.Value;
@@ -61,7 +60,7 @@ public class EnemyStatsManager : MonoBehaviour {
 
     public IEnumerator<float> RegenStatCoroutine(CharacterStat stat, CharacterStat maxStat, CharacterStat regenValue) {
         while (stat.Value < maxStat.Value && (int)stat.Value > 0 && enemyAI.GetSetEnemyParentContainer.activeSelf) {
-            StatModifier regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
+            regenModifier = new StatModifier(regenValue.Value, Global.StatModType.Flat, this);
             stat.AddModifier(regenModifier);
 
             enemyUIController.UpdateHealthUI(_currentHP: Health.Value,_maxHP: MaxHealth.Value);
@@ -73,14 +72,27 @@ public class EnemyStatsManager : MonoBehaviour {
             yield return Timing.WaitForSeconds(0.2f);
         }
 
-        isRegenPaused = true;
         Timing.PauseCoroutines(regenHPCourotine);
     }
 
-    public void RecalibrateStat(CharacterStat stat, CharacterStat maxStat) {
+    public IEnumerator<float> RegenHealth() {
+        while (true) {
+            if (Health.Value > 0 && Health.Value < MaxHealth.Value) {
+                regenModifier = new StatModifier(HealthRegenValue.Value, Global.StatModType.Flat, this);
+                Health.AddModifier(regenModifier);
+            } else {
+                RecalibrateStat(stat: Health,maxStat: MaxHealth);
+                Timing.PauseCoroutines(regenHPCourotine);
+            }
+
+            yield return Timing.WaitForSeconds(0.2f);
+        }
+    }
+
+    private void RecalibrateStat(CharacterStat stat, CharacterStat maxStat) {
         if (stat.Value > maxStat.Value) {
-            float difference = stat.Value - maxStat.Value;
-            StatModifier deductModifier = new StatModifier(-difference, Global.StatModType.Flat, this);
+            difference = stat.Value - maxStat.Value;
+            deductModifier = new StatModifier(-difference, Global.StatModType.Flat, this);
             stat.AddModifier(deductModifier);
         }
     }
